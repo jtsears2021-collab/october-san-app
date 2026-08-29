@@ -1,0 +1,11 @@
+{
+  "rewrites": [
+    { "source": "/buy/:tokenId", "destination": "/buy.html" },
+    { "source": "/list/:tokenId", "destination": "/list.html" },
+    { "source": "/admin", "destination": "/admin.html" },
+    { "source": "/daily", "destination": "/daily.html" },
+    { "source": "/my", "destination": "/my.html" },
+    { "source": "/profile", "destination": "/profile.html" },
+    { "source": "/mint", "destination": "/mint.html" }
+  ]
+}
