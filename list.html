@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>October-San — List Moment</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Mono:wght@300;400&family=Bebas+Neue&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --sky: #6BADE8;
+      --black: #080A0E;
+      --card: #111620;
+      --text: #E8EDF5;
+      --muted: #6B7A99;
+      --faint: #2A3347;
+      --green: #6BE8A0;
+      --red: #E86B6B;
+    }
+    body {
+      background: var(--black);
+      color: var(--text);
+      font-family: 'DM Mono', monospace;
+      font-size: 13px;
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+    nav {
+      padding: 1.2rem 1.5rem;
+      border-bottom: 1px solid var(--faint);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .logo {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.4rem;
+      font-style: italic;
+      color: var(--text);
+      text-decoration: none;
+    }
+    .logo span { color: var(--sky); }
+    .scroll-hint {
+      background: var(--sky);
+      color: var(--black);
+      text-align: center;
+      padding: 8px;
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 2px;
+    }
+    main { max-width: 480px; margin: 0 auto; padding: 2rem 1.5rem; }
+    .nft-image-container {
+      width: 100%;
+      aspect-ratio: 3/4;
+      background: var(--card);
+      border: 1px solid var(--faint);
+      border-radius: 8px;
+      overflow: hidden;
+      margin-bottom: 1.5rem;
+      position: relative;
+    }
+    .nft-image { width: 100%; height: 100%; object-fit: cover; }
+    .token-badge {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      background: rgba(0,0,0,0.7);
+      color: var(--sky);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      padding: 4px 10px;
+      border-radius: 4px;
+    }
+    .nft-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.6rem;
+      letter-spacing: 0.05em;
+      color: var(--text);
+      margin-bottom: 0.5rem;
+    }
+    .nft-meta {
+      color: var(--muted);
+      font-size: 0.75rem;
+      letter-spacing: 0.1em;
+      margin-bottom: 1.5rem;
+    }
+    .form-card {
+      background: var(--card);
+      border: 1px solid var(--faint);
+      border-radius: 4px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+    .form-label {
+      font-size: 0.65rem;
+      letter-spacing: 0.15em;
+      color: var(--muted);
+      margin-bottom: 6px;
+      display: block;
+    }
+    .form-input {
+      background: var(--black);
+      border: 1px solid var(--faint);
+      border-radius: 4px;
+      color: var(--text);
+      font-family: 'DM Mono', monospace;
+      font-size: 16px;
+      padding: 12px 14px;
+      width: 100%;
+      outline: none;
+      margin-bottom: 1rem;
+    }
+    .form-input:focus { border-color: var(--sky); }
+    .price-preview {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+      border-top: 1px solid var(--faint);
+      margin-top: 0.5rem;
+    }
+    .price-preview-label { color: var(--muted); font-size: 0.7rem; letter-spacing: 0.1em; }
+    .price-preview-value { color: var(--sky); font-size: 0.9rem; font-weight: 700; }
+    .wallet-card {
+      background: var(--card);
+      border: 1px solid var(--faint);
+      border-radius: 4px;
+      padding: 1.2rem;
+      margin-bottom: 1.5rem;
+      display: none;
+    }
+    .wallet-card.visible { display: block; }
+    .wallet-row { display: flex; justify-content: space-between; align-items: center; }
+    .wallet-label { color: var(--muted); font-size: 0.7rem; letter-spacing: 0.1em; }
+    .wallet-address { color: var(--sky); font-size: 0.75rem; }
+    .btn {
+      width: 100%;
+      border: none;
+      border-radius: 4px;
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      padding: 16px;
+      cursor: pointer;
+      margin-bottom: 0.75rem;
+      transition: opacity 0.2s;
+      display: block;
+      text-align: center;
+      text-decoration: none;
+    }
+    .btn:hover { opacity: 0.85; }
+    .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+    .btn-list { background: var(--green); color: var(--black); }
+    .btn-outline { background: transparent; border: 1px solid var(--faint); color: var(--text); }
+    .status-msg {
+      text-align: center;
+      padding: 1rem;
+      border-radius: 4px;
+      margin-bottom: 1rem;
+      font-size: 0.8rem;
+      display: none;
+    }
+    .status-msg.error { background: rgba(232,107,107,0.1); border: 1px solid var(--red); color: var(--red); display: block; }
+    .status-msg.info { background: rgba(107,173,232,0.1); border: 1px solid var(--sky); color: var(--sky); display: block; }
+    .success-screen { display: none; text-align: center; padding: 2rem 0; }
+    .success-screen.visible { display: block; }
+    .loading { text-align: center; padding: 3rem; color: var(--muted); }
+    footer {
+      text-align: center;
+      padding: 2rem;
+      color: var(--muted);
+      font-size: 0.65rem;
+      letter-spacing: 0.1em;
+      border-top: 1px solid var(--faint);
+      margin-top: 3rem;
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="/" class="logo">October-<span>San</span>™</a>
+  <div class="scroll-hint" style="color: var(--text); font-size: 9px; letter-spacing: 2px; font-family: 'DM Mono', monospace; background: none; padding: 0; letter-spacing: 2px;">SCROLL DOWN TO LIST ↓</div>
+</nav>
+
+<main>
+  <div id="loading" class="loading">Loading moment...</div>
+
+  <div id="nft-content" style="display:none;">
+    <div class="nft-image-container">
+      <img id="nft-image" class="nft-image" style="display:none;" />
+      <div id="nft-placeholder" style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:2rem;">◆</div>
+      <div class="token-badge" id="token-badge">#—</div>
+    </div>
+
+    <div class="nft-title" id="nft-title">October-San Moment</div>
+    <div class="nft-meta" id="nft-meta">OCTOBER-SAN · POLYGON</div>
+
+    <div id="status-msg" class="status-msg"></div>
+
+    <div id="wallet-card" class="wallet-card">
+      <div class="wallet-row">
+        <span class="wallet-label">YOUR WALLET</span>
+        <span class="wallet-address" id="wallet-address">—</span>
+      </div>
+    </div>
+
+    <div id="list-section">
+      <div class="form-card">
+        <label class="form-label">LIST PRICE (USD)</label>
+        <input type="number" inputmode="decimal" class="form-input" id="price-input" placeholder="ENTER USD PRICE" min="0.01" step="0.01" />
+        <div class="price-preview">
+          <span class="price-preview-label">APPROX. POL</span>
+          <span class="price-preview-value" id="pol-preview">— POL</span>
+        </div>
+                <div class="price-preview">
+          <span class="price-preview-label">YOU RECEIVE (90%)</span>
+          <span class="price-preview-value" id="receive-preview">—</span>
+        </div>
+        
+        <label class="form-label" style="margin-top:1rem;">ADD A CAPTION (OPTIONAL)</label>
+        <textarea class="form-input" id="caption-input" placeholder="Describe your moment..." maxlength="280" rows="3" style="resize:none;"></textarea>
+        <div style="color:var(--muted);font-size:0.65rem;text-align:right;margin-top:-0.75rem;margin-bottom:0.5rem;" id="caption-count">0/280</div>
+
+      <div id="auth-hint" style="color: var(--text); font-size: 0.65rem; letter-spacing: 0.15em; text-align: center; margin-bottom: 12px;">
+        TAP SIGN-IN TWICE TO AUTHENTICATE YOUR OCTOBER-SAN WALLET
+      </div>
+
+      <button id="connect-apple-btn" onclick="connectWallet('apple')" style="
+        background: #fff;
+        color: #000;
+        border: 1px solid #000;
+        border-radius: 6px;
+        width: 100%;
+        height: 44px;
+        font-family: -apple-system, SF Pro Display, sans-serif;
+        font-size: 16px;
+        font-weight: 500;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        margin-bottom: 0.75rem;
+      ">
+        <svg width="18" height="22" viewBox="0 0 18 22" fill="black" xmlns="http://www.w3.org/2000/svg">
+          <path d="M14.8 11.3c0-2.9 2.4-4.3 2.5-4.4-1.4-2-3.5-2.3-4.2-2.3-1.8-.2-3.5 1-4.4 1-.9 0-2.3-1-3.8-1-1.9 0-3.7 1.1-4.7 2.9-2 3.5-.5 8.6 1.4 11.5 1 1.4 2.1 2.9 3.6 2.8 1.4-.1 2-.9 3.7-.9 1.7 0 2.2.9 3.7.9 1.5 0 2.5-1.4 3.5-2.8.7-1 1.3-2.1 1.6-3.2-3.5-1.4-3.4-5.5-.9-5.5zM12.4 3.2c.8-1 1.3-2.3 1.2-3.7-1.2.1-2.6.8-3.4 1.8-.8.9-1.4 2.2-1.2 3.5 1.3.1 2.6-.6 3.4-1.6z"/>
+        </svg>
+        Sign in with Apple
+      </button>
+      <button id="connect-google-btn" class="btn btn-outline" onclick="connectWallet('google')">G &nbsp; SIGN IN WITH GOOGLE</button>
+      <button id="list-btn" class="btn btn-list" onclick="listNFT()" style="display:none;">LIST ON OCTOBER-SAN</button>
+    </div>
+  </div>
+
+  <div id="not-owner" style="display:none;text-align:center;padding:3rem;color:var(--muted);">
+    <p style="margin-bottom:1rem;">You don't own this moment.</p>
+    <a href="/" style="color:var(--sky);font-size:0.75rem;letter-spacing:0.1em;">← Browse marketplace</a>
+  </div>
+
+  <div id="success-screen" class="success-screen">
+    <img src="/icon.png" style="width:80px;height:80px;border-radius:18px;margin-bottom:1.5rem;box-shadow:0 0 0 1px var(--faint),0 0 20px rgba(107,173,232,0.8);" />
+    <div style="margin-bottom:1rem;line-height:1.6;text-align:center;">
+      <div style="font-family:'DM Mono',monospace;font-size:13px;letter-spacing:3px;color:var(--text);margin-bottom:8px;">YOUR</div>
+      <div style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:2rem;">
+        <span style="color:#E8EDF5;">October-</span><span style="color:var(--sky);">San</span>™
+      </div>
+      <div style="font-family:'DM Mono',monospace;font-size:13px;letter-spacing:3px;color:var(--text);margin-top:8px;">MOMENT IS LISTED.</div>
+    </div>
+    <div style="color:var(--muted);margin-bottom:1.5rem;">Return to the October-San app to view your collection.</div>
+    <a id="tx-link" style="color:var(--sky);font-size:0.7rem;letter-spacing:0.1em;text-decoration:none;display:block;margin-bottom:1rem;" href="#" target="_blank">VIEW TRANSACTION ON POLYGON ↗</a>
+  </div>
+
+  <div id="not-found" style="display:none;text-align:center;padding:3rem;color:var(--muted);">
+    Moment not found.
+  </div>
+</main>
+
+<footer>
+  © 2026 OCTOBER-SAN LLC · ALL RIGHTS RESERVED · POLYGON BLOCKCHAIN
+</footer>
+
+<script type="module">
+  import { createThirdwebClient, getContract, prepareContractCall, sendTransaction } from 'https://esm.sh/thirdweb@5.120.1';
+  import { polygon } from 'https://esm.sh/thirdweb@5.120.1/chains';
+  import { inAppWallet } from 'https://esm.sh/thirdweb@5.120.1/wallets';
+  import { ethers } from 'https://esm.sh/ethers@5.7.2';
+
+  const CLIENT_ID = 'fb1460b2756706cc08a4f650e68fd526';
+  const CONTRACT_ADDRESS = '0x397160Ad067BaaBa7f35Dd0b7A5C25F836b2539F';
+  const MARKETPLACE_ADDRESS = '0xef77CDF9Dc521563270B6aBba379dbc3d389C08c';
+  const POL_PRICE_USD = 0.07;
+
+  const client = createThirdwebClient({ clientId: CLIENT_ID });
+
+  let tokenId = null;
+  let connectedAccount = null;
+  let connectedWallet = null;
+
+  function getTokenIdFromUrl() {
+    const path = window.location.pathname;
+    const parts = path.split('/');
+    return parts[parts.length - 1] || parts[parts.length - 2];
+  }
+
+  async function loadNFT() {
+    tokenId = getTokenIdFromUrl();
+    if (!tokenId || tokenId === 'list') { showNotFound(); return; }
+    try {
+      const res = await fetch(
+        `https://137.insight.thirdweb.com/v1/nfts/${CONTRACT_ADDRESS}/${tokenId}`,
+        { headers: { 'x-client-id': CLIENT_ID } }
+      );
+      const data = await res.json();
+      const nft = data.data?.[0];
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('nft-content').style.display = 'block';
+      document.getElementById('token-badge').textContent = '#' + tokenId;
+      document.getElementById('nft-title').textContent = nft?.name || 'October-San Moment #' + tokenId;
+      document.getElementById('nft-meta').textContent = 'TOKEN #' + tokenId + ' · OCTOBER-SAN · POLYGON';
+      document.title = 'List Moment #' + tokenId + ' — October-San';
+      if (nft?.image_url) {
+        const imageUrl = nft.image_url.startsWith('ipfs://')
+          ? 'https://' + CLIENT_ID + '.ipfscdn.io/ipfs/' + nft.image_url.slice(7)
+          : nft.image_url;
+        const img = document.getElementById('nft-image');
+        img.src = imageUrl;
+        img.style.display = 'block';
+        document.getElementById('nft-placeholder').style.display = 'none';
+      }
+    } catch(e) { showNotFound(); }
+  }
+
+  function updatePricePreview() {
+    const usd = parseFloat(document.getElementById('price-input').value) || 0;
+    const pol = usd / POL_PRICE_USD;
+    const receive = usd * 0.9;
+    document.getElementById('pol-preview').textContent = pol > 0 ? pol.toFixed(4) + ' POL' : '— POL';
+    document.getElementById('receive-preview').textContent = receive > 0 ? '$' + receive.toFixed(2) + ' USD' : '—';
+  }
+
+  window.connectWallet = async function(strategy) {
+    const appleBtn = document.getElementById('connect-apple-btn');
+    const googleBtn = document.getElementById('connect-google-btn');
+    if (appleBtn) { appleBtn.disabled = true; appleBtn.textContent = 'CONNECTING...'; }
+    if (googleBtn) { googleBtn.disabled = true; }
+
+    try {
+      let account;
+      for (let i = 0; i < 2; i++) {
+        try {
+          const wallet = inAppWallet();
+          account = await wallet.connect({ client, strategy, chain: polygon });
+          connectedWallet = wallet;
+          break;
+        } catch(e) {
+          if (i === 1) throw e;
+          await new Promise(r => setTimeout(r, 500));
+        }
+      }
+
+      connectedAccount = account;
+      document.getElementById('wallet-address').textContent =
+        account.address.substring(0,6) + '...' + account.address.slice(-4);
+      document.getElementById('wallet-card').classList.add('visible');
+      document.getElementById('status-msg').style.display = 'none';
+      const authHint = document.getElementById('auth-hint');
+      if (authHint) authHint.style.display = 'none';
+
+      // Verify ownership
+      const provider = new ethers.providers.JsonRpcProvider('https://137.rpc.thirdweb.com/' + CLIENT_ID);
+      const nftAbi = ['function balanceOf(address account, uint256 id) view returns (uint256)'];
+      const nftContract = new ethers.Contract(CONTRACT_ADDRESS, nftAbi, provider);
+      const balance = await nftContract.balanceOf(account.address, tokenId);
+
+      if (balance.eq(0)) {
+        document.getElementById('nft-content').style.display = 'none';
+        document.getElementById('not-owner').style.display = 'block';
+        return;
+      }
+
+      if (appleBtn) appleBtn.style.display = 'none';
+      if (googleBtn) googleBtn.style.display = 'none';
+      document.getElementById('list-btn').style.display = 'block';
+
+    } catch(e) {
+      console.error('Connect error:', e.message);
+      if (appleBtn) {
+        appleBtn.innerHTML = '<svg width="18" height="22" viewBox="0 0 18 22" fill="black" xmlns="http://www.w3.org/2000/svg"><path d="M14.8 11.3c0-2.9 2.4-4.3 2.5-4.4-1.4-2-3.5-2.3-4.2-2.3-1.8-.2-3.5 1-4.4 1-.9 0-2.3-1-3.8-1-1.9 0-3.7 1.1-4.7 2.9-2 3.5-.5 8.6 1.4 11.5 1 1.4 2.1 2.9 3.6 2.8 1.4-.1 2-.9 3.7-.9 1.7 0 2.2.9 3.7.9 1.5 0 2.5-1.4 3.5-2.8.7-1 1.3-2.1 1.6-3.2-3.5-1.4-3.4-5.5-.9-5.5zM12.4 3.2c.8-1 1.3-2.3 1.2-3.7-1.2.1-2.6.8-3.4 1.8-.8.9-1.4 2.2-1.2 3.5 1.3.1 2.6-.6 3.4-1.6z"/></svg> Sign in with Apple';
+        appleBtn.disabled = false;
+      }
+      if (googleBtn) { googleBtn.disabled = false; }
+    }
+  };
+
+  window.listNFT = async function() {
+    const usdPrice = parseFloat(document.getElementById('price-input').value);
+    if (!usdPrice || usdPrice <= 0) { showStatus('Please enter a price.', 'error'); return; }
+    const btn = document.getElementById('list-btn');
+    btn.textContent = 'STEP 1 OF 2...';
+    btn.disabled = true;
+    showStatus('Approving marketplace...', 'info');
+    try {
+      const priceInPOL = (usdPrice / POL_PRICE_USD).toFixed(6);
+      const priceInWei = ethers.utils.parseEther(priceInPOL).toString();
+      const now = Math.floor(Date.now() / 1000);
+      const endTime = now + (30 * 24 * 60 * 60);
+
+      const nftContract = getContract({ client, chain: polygon, address: CONTRACT_ADDRESS });
+      const approveTx = prepareContractCall({
+        contract: nftContract,
+        method: 'function setApprovalForAll(address operator, bool approved)',
+        params: [MARKETPLACE_ADDRESS, true],
+      });
+      await sendTransaction({ transaction: approveTx, account: connectedAccount });
+      
+      btn.textContent = 'STEP 2 OF 2...';
+      showStatus('Creating listing...', 'info');
+
+      const marketContract = getContract({ client, chain: polygon, address: MARKETPLACE_ADDRESS });
+      const listTx = prepareContractCall({
+        contract: marketContract,
+        method: 'function createListing((address assetContract, uint256 tokenId, uint256 quantity, address currency, uint256 pricePerToken, uint128 startTimestamp, uint128 endTimestamp, bool reserved) params) returns (uint256)',
+        params: [{
+          assetContract: CONTRACT_ADDRESS,
+          tokenId: BigInt(tokenId),
+          quantity: BigInt(1),
+          currency: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE',
+          pricePerToken: BigInt(priceInWei),
+          startTimestamp: BigInt(now),
+          endTimestamp: BigInt(endTime),
+          reserved: false,
+        }],
+      });
+      const result = await sendTransaction({ transaction: listTx, account: connectedAccount });
+      const txHash = result.transactionHash || result.hash || '';
+      const caption = document.getElementById('caption-input').value.trim();
+      
+            // Show success first
+      document.getElementById('nft-content').style.display = 'none';
+      document.getElementById('success-screen').classList.add('visible');
+      document.querySelector('.scroll-hint').style.display = 'none';
+      document.getElementById('tx-link').href = txHash ? 'https://polygonscan.com/tx/' + txHash : 'https://polygonscan.com';
+
+      // Then save caption (non-blocking, fire and forget)
+      if (caption) {
+        fetch(
+          `https://firestore.googleapis.com/v1/projects/october-san-e3a33/databases/(default)/documents/listings/${tokenId}`,
+          {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              fields: {
+                caption: { stringValue: caption },
+                tokenId: { stringValue: tokenId },
+                listedAt: { stringValue: new Date().toISOString() },
+                seller: { stringValue: connectedAccount.address }
+              }
+            })
+          }
+        ).catch(e => console.log('Caption save error:', e.message));
+      }
+
+    } catch(e) {
+      console.error('List error:', e.message, e.stack);
+      showStatus('Listing failed: ' + e.message, 'error');
+      btn.textContent = 'LIST ON OCTOBER-SAN';
+      btn.disabled = false;
+    }
+  };
+
+  function showNotFound() {
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('not-found').style.display = 'block';
+  }
+
+  function showStatus(msg, type) {
+    const el = document.getElementById('status-msg');
+    el.textContent = msg;
+    el.className = 'status-msg ' + type;
+  }
+
+  document.getElementById('caption-input')?.addEventListener('input', function() {
+    document.getElementById('caption-count').textContent = this.value.length + '/280';
+  });
+  
+  loadNFT();
+  document.getElementById('price-input')?.addEventListener('input', updatePricePreview);
+</script>
+
+</body>
+</html>
