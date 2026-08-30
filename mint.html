@@ -750,9 +750,8 @@
     setStep('step-upload', 'active');
 
     try {
-      const thirdweb = await import('https://esm.sh/thirdweb@5.120.1');
-      const client = thirdweb.createThirdwebClient({ clientId: CLIENT_ID });
-      const upload = thirdweb.upload;
+      const { createThirdwebClient } = await import('https://esm.sh/thirdweb@5.120.1');
+      const { upload } = await import('https://esm.sh/thirdweb@5.120.1/storage');
       const client = createThirdwebClient({ clientId: CLIENT_ID });
 
       // Upload media to IPFS
