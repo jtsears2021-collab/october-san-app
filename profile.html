@@ -503,14 +503,13 @@
           <div class="wallet-balance" id="wallet-balance">— POL</div>
           <div class="wallet-balance-usd" id="wallet-balance-usd">≈ $— USD</div>
         </div>
-        <div class="wallet-actions">
-          <button class="wallet-action" onclick="showSend()">
-            <div class="action-icon">↑</div>
-            <span class="action-label">SEND</span>
+        <button class="wallet-action" onclick="showToast('SWAP COMING SOON')">
+            <div class="action-icon">⇄</div>
+            <span class="action-label">SWAP</span>
           </button>
           <button class="wallet-action" onclick="showReceive()">
             <div class="action-icon">↓</div>
-            <span class="action-label">RECEIVE</span>
+            <span class="action-label">ADD POL</span>
           </button>
           <button class="wallet-action" onclick="buyPOL()">
             <div class="action-icon">＋</div>
@@ -693,48 +692,50 @@
   };
 
   window.showReceive = function() {
-    // Generate simple QR code using canvas
+    const existing = document.getElementById('receive-sheet');
+    if (existing) { existing.remove(); return; }
+    
+    const sheet = document.createElement('div');
+    sheet.id = 'receive-sheet';
+    sheet.style.cssText = 'position:fixed;bottom:0;left:0;right:0;background:var(--card);border-radius:16px 16px 0 0;padding:1.5rem;z-index:600;border-top:1px solid var(--faint);';
+    sheet.innerHTML = `
+      <div style="width:40px;height:4px;background:var(--faint);border-radius:2px;margin:0 auto 1rem;"></div>
+      <div style="font-size:9px;letter-spacing:2px;color:var(--muted);text-align:center;margin-bottom:1rem;">ADD POL TO YOUR WALLET</div>
+      <div style="font-size:9px;letter-spacing:1px;color:var(--muted);text-align:center;margin-bottom:1.5rem;line-height:1.8;">Send POL from MetaMask, Coinbase,<br>or any exchange to this address:</div>
+      <div style="background:var(--black);border:1px solid var(--faint);border-radius:4px;padding:12px;text-align:center;margin-bottom:12px;">
+        <div style="color:var(--sky);font-size:12px;word-break:break-all;letter-spacing:0.5px;">${walletAddress}</div>
+      </div>
+      <button onclick="navigator.clipboard.writeText('${walletAddress}').then(()=>showToast('✓ ADDRESS COPIED'));document.getElementById('receive-sheet').remove();" 
+              style="width:100%;background:var(--sky);color:var(--black);border:none;border-radius:4px;font-family:'DM Mono',monospace;font-size:11px;font-weight:700;letter-spacing:2px;padding:14px;cursor:pointer;margin-bottom:8px;">
+        COPY WALLET ADDRESS
+      </button>
+      <button onclick="document.getElementById('receive-sheet').remove();showQR();"
+              style="width:100%;background:transparent;color:var(--text);border:1px solid var(--faint);border-radius:4px;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:2px;padding:12px;cursor:pointer;margin-bottom:8px;">
+        SHOW QR CODE
+      </button>
+      <button onclick="document.getElementById('receive-sheet').remove();"
+              style="width:100%;background:transparent;color:var(--muted);border:none;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1px;padding:8px;cursor:pointer;">
+        CANCEL
+      </button>
+    `;
+    document.body.appendChild(sheet);
+    setTimeout(() => {
+      document.addEventListener('click', function closeSheet(e) {
+        if (!sheet.contains(e.target) && !e.target.closest('.wallet-action')) {
+          sheet.remove();
+          document.removeEventListener('click', closeSheet);
+        }
+      });
+    }, 100);
+  };
+
+  window.showQR = function() {
     document.getElementById('qr-modal').classList.add('visible');
     generateQR(walletAddress);
   };
-
-  window.closeQR = function() {
-    document.getElementById('qr-modal').classList.remove('visible');
-  };
-
-  function generateQR(text) {
-    // Simple QR placeholder — use a QR service
-    const canvas = document.getElementById('qr-canvas');
-    const ctx = canvas.getContext('2d');
-    const img = new Image();
-    img.onload = () => ctx.drawImage(img, 0, 0, 200, 200);
-    img.src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(text)}&bgcolor=111620&color=6BADE8&margin=10`;
-  }
-
-  window.showSend = function() {
-    document.getElementById('send-modal').classList.add('visible');
-  };
-
-  window.closeSend = function() {
-    document.getElementById('send-modal').classList.remove('visible');
-  };
-
-  window.executeSend = function() {
-    const toAddress = document.getElementById('send-address').value.trim();
-    const amount = document.getElementById('send-amount').value.trim();
-    if (!toAddress || !amount) { showToast('Enter address and amount'); return; }
-    // Open MetaMask with pre-filled data
-    window.location.href = `metamask://send?address=${toAddress}&amount=${amount}&chainId=137`;
-    setTimeout(() => {
-      window.open('https://metamask.io/download/', '_blank');
-    }, 1000);
-    closeSend();
-  };
-
+  
   window.buyPOL = function() {
-    // Transak works in California
-    const url = `https://global.transak.com/?apiKey=e8c7c40d-a7b2-4e1f-8e25-a07f54f2c93d&defaultCryptoCurrency=MATIC&walletAddress=${walletAddress}&networks=polygon`;
-    window.open(url, '_blank');
+    window.open(`https://pay.coinbase.com/buy/select-asset?destinationWallets=[{"address":"${walletAddress}","assets":["MATIC"],"supportedNetworks":["polygon"]}]`, '_blank');
   };
 
   window.viewOnPolygonscan = function() {
