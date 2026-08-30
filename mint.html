@@ -626,8 +626,8 @@
     showScreen('camera-screen');
     try {
       if (stream) stream.getTracks().forEach(t => t.stop());
-      stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode, width: { ideal: 1080 }, height: { ideal: 1920 } },
+     stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode },
         audio: captureMode === 'video'
       });
       document.getElementById('camera-video').srcObject = stream;
