@@ -22,10 +22,11 @@ self.addEventListener('activate', event => {
 });
 
 self.addEventListener('fetch', event => {
-  // Network first for API calls
   if (event.request.url.includes('firestore') || 
       event.request.url.includes('thirdweb') ||
-      event.request.url.includes('ipfs')) {
+      event.request.url.includes('ipfs') ||
+      event.request.url.includes('october-san.com/api') ||
+      event.request.url.includes('googleapis')) {
     return;
   }
   event.respondWith(
