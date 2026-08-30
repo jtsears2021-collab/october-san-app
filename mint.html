@@ -780,10 +780,14 @@
         description: `A fan-captured ${capturedType} moment. ${today} Collection.`,
         image: imageUrl,
       };
+      const metadataBlob = new Blob([JSON.stringify(metadataObj)], { type: 'application/json' });
+      const metadataForm = new FormData();
+      metadataForm.append('file', metadataBlob, 'metadata.json');
+      
       const metadataRes = await fetch('https://storage.thirdweb.com/ipfs/upload', {
         method: 'POST',
-        headers: { 'x-client-id': CLIENT_ID, 'Content-Type': 'application/json' },
-        body: JSON.stringify(metadataObj),
+        headers: { 'x-client-id': CLIENT_ID },
+        body: metadataForm,
       });
       const metadataData = await metadataRes.json();
       const metadataUri = 'ipfs://' + metadataData.IpfsHash;
