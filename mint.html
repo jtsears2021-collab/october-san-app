@@ -708,12 +708,20 @@
   }
 
   // ─── PREVIEW ──────────────────────────────────────────────
-  function showPreview() {
+  async function showPreview() {
     if (stream) stream.getTracks().forEach(t => t.stop());
     showScreen('preview-screen');
 
     const url = URL.createObjectURL(capturedBlob);
     const today = new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+
+    // Fetch collection number from Firebase
+    let collectionNum = '—';
+    try {
+      const res = await fetch('https://firestore.googleapis.com/v1/projects/october-san-e3a33/databases/(default)/documents/collections/current?key=AIzaSyBX6hKfUBi8oXx9ew22-jLpL4SxQJKoRIg');
+      const data = await res.json();
+      collectionNum = data.fields?.collectionNumber?.integerValue || '1';
+    } catch(e) {}
 
     if (capturedType === 'photo') {
       document.getElementById('preview-media').src = url;
@@ -726,7 +734,7 @@
       document.getElementById('preview-media').style.display = 'none';
       document.getElementById('preview-title').textContent = 'October-San Video Moment · ' + today;
     }
-    document.getElementById('preview-meta').textContent = 'POLYGON BLOCKCHAIN · ' + today.toUpperCase();
+    document.getElementById('preview-meta').textContent = 'TOKEN #— · COLLECTION #' + collectionNum + ' · POLYGON';
   }
 
   window.retake = function() {
