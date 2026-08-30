@@ -754,9 +754,6 @@
     setStep('step-upload', 'active');
 
     try {
-      const { createThirdwebClient } = await import('https://esm.sh/thirdweb@5.120.1');
-      const { upload } = await import('https://esm.sh/thirdweb@5.120.1/storage');
-      const client = createThirdwebClient({ clientId: CLIENT_ID });
 
       // Upload media to IPFS
       const file = new File([capturedBlob], capturedType === 'photo' ? 'moment.jpg' : 'moment.mp4', {
@@ -764,24 +761,34 @@
       });
       const mediaUri = await upload({ client, files: [file] });
 
-      // Create and upload metadata
-      const today = new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
-      const imageUrl = mediaUri[0];
+      // Upload media directly to Thirdweb IPFS
+      const formData = new FormData();
+      formData.append('file', file);
+      
+      const uploadRes = await fetch('https://storage.thirdweb.com/ipfs/upload', {
+        method: 'POST',
+        headers: { 'x-client-id': CLIENT_ID },
+        body: formData,
+      });
+      const uploadData = await uploadRes.json();
+      const imageUrl = 'ipfs://' + uploadData.IpfsHash;
       console.log('Media URI:', imageUrl);
 
+      // Upload metadata
+      const today = new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
       const metadataObj = {
         name: `October-San ${capturedType === 'video' ? 'Video ' : ''}Moment · ${today}`,
         description: `A fan-captured ${capturedType} moment. ${today} Collection.`,
         image: imageUrl,
       };
-
-      const metadataFile = new File(
-        [JSON.stringify(metadataObj)],
-        'metadata.json',
-        { type: 'application/json' }
-      );
-      const metadataUri = await upload({ client, files: [metadataFile] });
-      console.log('Metadata URI:', metadataUri[0]);
+      const metadataRes = await fetch('https://storage.thirdweb.com/ipfs/upload', {
+        method: 'POST',
+        headers: { 'x-client-id': CLIENT_ID, 'Content-Type': 'application/json' },
+        body: JSON.stringify(metadataObj),
+      });
+      const metadataData = await metadataRes.json();
+      const metadataUri = 'ipfs://' + metadataData.IpfsHash;
+      console.log('Metadata URI:', metadataUri);
 
       setStep('step-upload', 'done');
       setStep('step-mint', 'active');
