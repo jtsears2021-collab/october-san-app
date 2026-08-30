@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="theme-color" content="#080A0E">
+  <title>October-San — My Collection</title>
+  <link rel="manifest" href="/manifest.json">
+  <link rel="apple-touch-icon" href="/icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Mono:wght@300;400&family=Bebas+Neue&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --sky: #6BADE8;
+      --black: #080A0E;
+      --card: #111620;
+      --text: #E8EDF5;
+      --muted: #6B7A99;
+      --faint: #2A3347;
+      --green: #6BE8A0;
+      --red: #E86B6B;
+    }
+    html, body {
+      height: 100%;
+      background: var(--black);
+      color: var(--text);
+      font-family: 'DM Mono', monospace;
+      overscroll-behavior: none;
+    }
+    #app {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      height: 100dvh;
+      overflow: hidden;
+    }
+    #header {
+      flex-shrink: 0;
+      background: var(--black);
+      border-bottom: 1px solid var(--faint);
+      padding: 12px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .logo {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-size: 1.3rem;
+      color: var(--text);
+      text-decoration: none;
+    }
+    .logo span { color: var(--sky); }
+    .header-right {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 2px;
+    }
+    .header-username {
+      font-size: 10px;
+      letter-spacing: 1px;
+      color: var(--sky);
+    }
+    .header-title {
+      font-size: 8px;
+      letter-spacing: 2px;
+      color: var(--muted);
+    }
+    #filters {
+      flex-shrink: 0;
+      background: var(--black);
+      border-bottom: 1px solid var(--faint);
+      padding: 8px 16px;
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    .filter-btn {
+      background: transparent;
+      border: 1px solid var(--faint);
+      border-radius: 20px;
+      color: var(--text);
+      font-family: 'DM Mono', monospace;
+      font-size: 9px;
+      letter-spacing: 1.5px;
+      padding: 5px 12px;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .filter-btn.active { background: var(--sky); border-color: var(--sky); color: var(--black); }
+    #search-bar {
+      flex-shrink: 0;
+      padding: 8px 16px;
+      border-bottom: 1px solid var(--faint);
+    }
+    .search-input {
+      background: var(--card);
+      border: 1px solid var(--faint);
+      border-radius: 4px;
+      color: var(--text);
+      font-family: 'DM Mono', monospace;
+      font-size: 12px;
+      padding: 8px 12px;
+      width: 100%;
+      outline: none;
+    }
+    .search-input:focus { border-color: var(--sky); }
+    #grid-container {
+      flex: 1;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      padding: 8px;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 4px;
+    }
+    .thumb {
+      position: relative;
+      aspect-ratio: 3/4;
+      background: var(--card);
+      cursor: pointer;
+      overflow: hidden;
+      border-radius: 2px;
+    }
+    .thumb img, .thumb video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .thumb-token {
+      position: absolute;
+      top: 4px;
+      left: 4px;
+      background: rgba(8,10,14,0.7);
+      color: var(--sky);
+      font-size: 8px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      padding: 2px 6px;
+      border-radius: 2px;
+    }
+    .thumb-listed {
+      position: absolute;
+      inset: 0;
+      border: 2px solid var(--sky);
+      border-radius: 2px;
+      pointer-events: none;
+    }
+    .thumb-placeholder {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--muted);
+      font-size: 1.2rem;
+    }
+
+    /* ─── SNAP OVERLAY ─── */
+    #snap-overlay {
+      position: fixed;
+      inset: 0;
+      background: var(--black);
+      z-index: 500;
+      display: none;
+      flex-direction: column;
+    }
+    #snap-overlay.visible { display: flex; }
+    #snap-header {
+      flex-shrink: 0;
+      padding: 12px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--faint);
+      background: var(--black);
+    }
+    #snap-back {
+      color: var(--sky);
+      font-size: 13px;
+      cursor: pointer;
+      background: none;
+      border: none;
+      font-family: 'DM Mono', monospace;
+    }
+    #snap-count { font-size: 10px; letter-spacing: 1px; color: var(--muted); }
+    #snap-feed { flex: 1; overflow-y: auto; scroll-snap-type: y mandatory; -webkit-overflow-scrolling: touch; }
+    .snap-card { scroll-snap-align: start; height: 100%; position: relative; background: var(--black); }
+    .snap-card-media { width: 100%; height: 100%; object-fit: cover; }
+    .snap-card video { width: 100%; height: 100%; object-fit: cover; }
+    .snap-card-token {
+      position: absolute; top: 12px; left: 12px;
+      background: rgba(8,10,14,0.7); color: var(--sky);
+      font-size: 10px; font-weight: 700; letter-spacing: 1px;
+      padding: 4px 10px; border-radius: 4px;
+    }
+    .snap-card-overlay {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      padding: 20px 16px 24px;
+      background: linear-gradient(transparent, rgba(8,10,14,0.9));
+    }
+    .nft-name-label { font-size: 11px; color: var(--muted); margin-bottom: 10px; }
+    .snap-actions { display: flex; gap: 10px; align-items: center; }
+    .btn-buy {
+      background: var(--green); color: var(--black); border: none;
+      border-radius: 4px; font-family: 'DM Mono', monospace;
+      font-size: 10px; font-weight: 700; letter-spacing: 1.5px;
+      padding: 10px 20px; cursor: pointer; flex: 1;
+    }
+    .btn-action {
+      background: transparent; color: var(--sky); border: 1px solid var(--sky);
+      border-radius: 4px; font-family: 'DM Mono', monospace;
+      font-size: 10px; font-weight: 700; letter-spacing: 1.5px;
+      padding: 10px 20px; cursor: pointer; flex: 1;
+      text-decoration: none; text-align: center;
+    }
+    .btn-cancel {
+      background: transparent; color: var(--red); border: 1px solid var(--red);
+      border-radius: 4px; font-family: 'DM Mono', monospace;
+      font-size: 10px; font-weight: 700; letter-spacing: 1.5px;
+      padding: 10px 20px; cursor: pointer; flex: 1;
+      text-decoration: none; text-align: center;
+    }
+
+    .loading {
+      display: flex; flex-direction: column; align-items: center;
+      justify-content: center; height: 200px; gap: 12px;
+      color: var(--muted); font-size: 10px; letter-spacing: 2px;
+    }
+    .spinner {
+      width: 20px; height: 20px;
+      border: 2px solid var(--faint); border-top-color: var(--sky);
+      border-radius: 50%; animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .empty {
+      display: flex; align-items: center; justify-content: center;
+      height: 200px; color: var(--muted); font-size: 11px;
+      letter-spacing: 1px; text-align: center; padding: 2rem;
+    }
+
+    /* ─── SIGN IN PROMPT ─── */
+    #signin-prompt {
+      display: flex; flex-direction: column; align-items: center;
+      justify-content: center; flex: 1; gap: 1rem; padding: 2rem;
+      text-align: center;
+    }
+    .signin-prompt-text { color: var(--muted); font-size: 11px; letter-spacing: 1px; }
+    .btn-signin {
+      background: #fff; color: #000; border: 1px solid #000;
+      border-radius: 6px; width: 100%; max-width: 280px; height: 44px;
+      font-family: -apple-system, sans-serif; font-size: 15px;
+      font-weight: 500; cursor: pointer; display: flex;
+      align-items: center; justify-content: center; gap: 8px;
+    }
+    .btn-signin-google {
+      background: transparent; color: var(--text); border: 1px solid var(--faint);
+      border-radius: 6px; width: 100%; max-width: 280px; height: 44px;
+      font-family: 'DM Mono', monospace; font-size: 13px;
+      cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+
+    #tab-bar {
+      flex-shrink: 0; display: flex; background: var(--black);
+      border-top: 1px solid var(--faint);
+      padding-bottom: env(safe-area-inset-bottom);
+    }
+    .tab {
+      flex: 1; display: flex; flex-direction: column; align-items: center;
+      padding: 10px 0; cursor: pointer; border: none; background: none;
+      color: var(--sky); font-family: 'DM Mono', monospace;
+      font-size: 9px; letter-spacing: 1.5px; gap: 4px; text-decoration: none;
+    }
+    .tab.active { color: var(--text); }
+    .tab-icon { font-size: 18px; }
+  </style>
+</head>
+<body>
+
+<div id="app">
+  <div id="header">
+    <a href="/" class="logo">October-<span>San</span>™</a>
+    <div class="header-right">
+      <span class="header-username" id="header-username"></span>
+      <span class="header-title">MY COLLECTION</span>
+    </div>
+  </div>
+
+  <div id="filters">
+    <button class="filter-btn active" onclick="setFilter('all')" id="f-all">ALL</button>
+    <button class="filter-btn" onclick="setFilter('listed')" id="f-listed">LISTED</button>
+    <button class="filter-btn" onclick="setFilter('private')" id="f-private">PRIVATE</button>
+    <button class="filter-btn" onclick="toggleSort()" id="f-sort">NEWEST ↓</button>
+  </div>
+
+  <div id="search-bar">
+    <input type="search" class="search-input" placeholder="Search my moments..." id="search-input" oninput="renderGrid()" />
+  </div>
+
+  <div id="grid-container">
+    <div id="signin-prompt" style="display:none;">
+      <div class="signin-prompt-text">SIGN IN TO VIEW YOUR COLLECTION</div>
+      <button class="btn-signin" onclick="signIn('apple')">
+        <svg width="16" height="20" viewBox="0 0 18 22" fill="black"><path d="M14.8 11.3c0-2.9 2.4-4.3 2.5-4.4-1.4-2-3.5-2.3-4.2-2.3-1.8-.2-3.5 1-4.4 1-.9 0-2.3-1-3.8-1-1.9 0-3.7 1.1-4.7 2.9-2 3.5-.5 8.6 1.4 11.5 1 1.4 2.1 2.9 3.6 2.8 1.4-.1 2-.9 3.7-.9 1.7 0 2.2.9 3.7.9 1.5 0 2.5-1.4 3.5-2.8.7-1 1.3-2.1 1.6-3.2-3.5-1.4-3.4-5.5-.9-5.5zM12.4 3.2c.8-1 1.3-2.3 1.2-3.7-1.2.1-2.6.8-3.4 1.8-.8.9-1.4 2.2-1.2 3.5 1.3.1 2.6-.6 3.4-1.6z"/></svg>
+        Sign in with Apple
+      </button>
+      <button class="btn-signin-google" onclick="signIn('google')">G &nbsp; Sign in with Google</button>
+    </div>
+    <div id="loading" class="loading" style="display:none;">
+      <div class="spinner"></div>
+      <span>LOADING YOUR COLLECTION...</span>
+    </div>
+    <div id="grid" class="grid" style="display:none;"></div>
+    <div id="empty" class="empty" style="display:none;">No moments here. Try a different filter.</div>
+  </div>
+
+  <div id="tab-bar">
+    <a class="tab" href="/"><span class="tab-icon">◉</span><span>HOME</span></a>
+    <a class="tab" href="/daily"><span class="tab-icon">⊞</span><span>DAILY</span></a>
+    <a class="tab active" href="/my"><span class="tab-icon">◯</span><span>MY</span></a>
+    <a class="tab" href="/profile"><span class="tab-icon">⊙</span><span>PROFILE</span></a>
+  </div>
+</div>
+
+<!-- SNAP OVERLAY -->
+<div id="snap-overlay">
+  <div id="snap-header">
+    <button id="snap-back" onclick="closeSnap()">← BACK</button>
+    <span id="snap-count"></span>
+  </div>
+  <div id="snap-feed"></div>
+</div>
+
+<script type="module">
+  import { createThirdwebClient } from 'https://esm.sh/thirdweb@5.120.1';
+  import { inAppWallet } from 'https://esm.sh/thirdweb@5.120.1/wallets';
+  import { polygon } from 'https://esm.sh/thirdweb@5.120.1/chains';
+  import { ethers } from 'https://esm.sh/ethers@5.7.2';
+
+  const CLIENT_ID = 'fb1460b2756706cc08a4f650e68fd526';
+  const CONTRACT_ADDRESS = '0x397160Ad067BaaBa7f35Dd0b7A5C25F836b2539F';
+  const MARKETPLACE_ADDRESS = '0xef77CDF9Dc521563270B6aBba379dbc3d389C08c';
+  const FIREBASE_URL = 'https://firestore.googleapis.com/v1/projects/october-san-e3a33/databases/(default)/documents';
+  const FIREBASE_API_KEY = 'AIzaSyBX6hKfUBi8oXx9ew22-jLpL4SxQJKoRIg';
+
+  const client = createThirdwebClient({ clientId: CLIENT_ID });
+
+  let myNFTs = [];
+  let activeListings = [];
+  let currentFilter = 'all';
+  let currentSort = 'newest';
+  let currentUser = null;
+  let snapNFTs = [];
+
+  const stored = localStorage.getItem('octsn_user');
+  if (stored) {
+    currentUser = JSON.parse(stored);
+    document.getElementById('header-username').textContent = '@' + currentUser.username;
+  }
+
+  function ipfsUrl(url) {
+    if (!url) return null;
+    return url.startsWith('ipfs://') ? `https://${CLIENT_ID}.ipfscdn.io/ipfs/${url.slice(7)}` : url;
+  }
+
+  async function init() {
+    if (!currentUser) {
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('signin-prompt').style.display = 'flex';
+      return;
+    }
+    document.getElementById('signin-prompt').style.display = 'none';
+    document.getElementById('loading').style.display = 'flex';
+    await loadData();
+  }
+
+  async function loadData() {
+    try {
+      // Fetch user's NFTs
+      const res = await fetch(
+        `https://polygon.insight.thirdweb.com/v1/nfts?owner_address=${currentUser.walletAddress}&contract_address=${CONTRACT_ADDRESS}&chain=137`,
+        { headers: { 'x-client-id': CLIENT_ID } }
+      );
+      const data = await res.json();
+      myNFTs = (data.data || []).map(nft => ({
+        ...nft,
+        image_url: ipfsUrl(nft.image_url),
+        isVideo: nft.name?.toLowerCase().includes('video'),
+      }));
+
+      // Fetch marketplace listings
+      const provider = new ethers.providers.JsonRpcProvider(`https://137.rpc.thirdweb.com/${CLIENT_ID}`);
+      const marketAbi = [
+        'function getAllListings(uint256 _startId, uint256 _endId) external view returns (tuple(uint256 listingId, uint256 tokenId, uint256 quantity, uint256 pricePerToken, uint128 startTimestamp, uint128 endTimestamp, address listingCreator, address assetContract, address currency, uint8 tokenType, uint8 status, bool reserved)[] listings)',
+        'function totalListings() external view returns (uint256)',
+      ];
+      const marketplace = new ethers.Contract(MARKETPLACE_ADDRESS, marketAbi, provider);
+      const total = await marketplace.totalListings();
+      if (!total.eq(0)) {
+        const listings = await marketplace.getAllListings(0, total.sub(1));
+        const now = Math.floor(Date.now() / 1000);
+        activeListings = listings.filter(l =>
+          parseInt(l.status) === 1 &&
+          l.listingCreator.toLowerCase() === currentUser.walletAddress.toLowerCase() &&
+          parseInt(l.endTimestamp) > now
+        );
+      }
+
+      // Merge listing data
+      myNFTs = myNFTs.map(nft => {
+        const listing = activeListings.find(l => l.tokenId.toString() === nft.token_id);
+        if (listing) {
+          const priceInPOL = ethers.utils.formatEther(listing.pricePerToken);
+          return {
+            ...nft,
+            listed: true,
+            listing_id: listing.listingId.toString(),
+            price_pol: priceInPOL,
+            price_usd: (parseFloat(priceInPOL) * 0.07).toFixed(2),
+          };
+        }
+        return { ...nft, listed: false };
+      });
+
+      document.getElementById('loading').style.display = 'none';
+      renderGrid();
+
+    } catch(e) {
+      console.error('Load error:', e);
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('empty').style.display = 'flex';
+    }
+  }
+
+  window.renderGrid = function() {
+    const search = document.getElementById('search-input').value.toLowerCase();
+    let filtered = myNFTs.filter(nft => {
+      if (currentFilter === 'listed' && !nft.listed) return false;
+      if (currentFilter === 'private' && nft.listed) return false;
+      if (search && !nft.name?.toLowerCase().includes(search) && !nft.token_id.includes(search)) return false;
+      return true;
+    });
+
+    filtered = filtered.sort((a, b) =>
+      currentSort === 'newest'
+        ? parseInt(b.token_id) - parseInt(a.token_id)
+        : parseInt(a.token_id) - parseInt(b.token_id)
+    );
+
+    snapNFTs = filtered;
+
+    if (filtered.length === 0) {
+      document.getElementById('grid').style.display = 'none';
+      document.getElementById('empty').style.display = 'flex';
+      return;
+    }
+
+    document.getElementById('empty').style.display = 'none';
+    document.getElementById('grid').style.display = 'grid';
+    document.getElementById('grid').innerHTML = filtered.map((nft, i) => `
+      <div class="thumb" onclick="openSnap(${i})">
+        ${nft.image_url
+          ? nft.isVideo
+            ? `<video src="${nft.image_url}" muted playsinline style="width:100%;height:100%;object-fit:cover;"></video>`
+            : `<img src="${nft.image_url}" loading="lazy" />`
+          : `<div class="thumb-placeholder">◆</div>`
+        }
+        <div class="thumb-token">#${nft.token_id}</div>
+        ${nft.listed ? '<div class="thumb-listed"></div>' : ''}
+      </div>
+    `).join('');
+  };
+
+  window.setFilter = function(f) {
+    currentFilter = f;
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('f-' + f).classList.add('active');
+    document.getElementById('f-sort').classList.add('active');
+    renderGrid();
+  };
+
+  window.toggleSort = function() {
+    currentSort = currentSort === 'newest' ? 'oldest' : 'newest';
+    document.getElementById('f-sort').textContent = currentSort === 'newest' ? 'NEWEST ↓' : 'OLDEST ↓';
+    renderGrid();
+  };
+
+  // ─── SNAP SCROLL ──────────────────────────────────────────
+  window.openSnap = function(startIndex) {
+    document.getElementById('snap-overlay').classList.add('visible');
+    renderSnapFeed(startIndex);
+  };
+
+  window.closeSnap = function() {
+    document.getElementById('snap-overlay').classList.remove('visible');
+    document.getElementById('snap-feed').innerHTML = '';
+  };
+
+  function renderSnapFeed(startIndex) {
+    const feed = document.getElementById('snap-feed');
+    const snapH = window.innerHeight - 56;
+    feed.style.height = snapH + 'px';
+
+    feed.innerHTML = snapNFTs.map((nft, i) => `
+      <div class="snap-card" style="height:${snapH}px;">
+        ${nft.image_url
+          ? nft.isVideo
+            ? `<video class="snap-card-media" src="${nft.image_url}" autoplay muted loop playsinline></video>`
+            : `<img class="snap-card-media" src="${nft.image_url}" />`
+          : `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:3rem;">◆</div>`
+        }
+        <div class="snap-card-token">#${nft.token_id}</div>
+        <div class="snap-card-overlay">
+          <div class="nft-name-label">${nft.name || 'October-San Moment #' + nft.token_id}</div>
+          <div class="snap-actions">
+            ${nft.listed
+              ? `<a class="btn-cancel" href="/buy/${nft.token_id}">CANCEL LISTING</a>
+                 <div style="font-size:10px;color:var(--green);letter-spacing:1px;">$${nft.price_usd} · ${parseFloat(nft.price_pol).toFixed(2)} POL</div>`
+              : `<a class="btn-action" href="/list/${nft.token_id}">LIST FOR SALE</a>`
+            }
+          </div>
+        </div>
+      </div>
+    `).join('');
+
+    setTimeout(() => {
+      feed.scrollTop = startIndex * snapH;
+      document.getElementById('snap-count').textContent = `${startIndex + 1} / ${snapNFTs.length}`;
+    }, 50);
+
+    feed.addEventListener('scroll', () => {
+      const idx = Math.round(feed.scrollTop / snapH);
+      document.getElementById('snap-count').textContent = `${idx + 1} / ${snapNFTs.length}`;
+    });
+  }
+
+  // ─── SIGN IN ──────────────────────────────────────────────
+  window.signIn = async function(strategy) {
+    try {
+      const wallet = inAppWallet();
+      const account = await wallet.connect({ client, strategy, chain: polygon });
+      
+      const res = await fetch(
+        `${FIREBASE_URL}/walletLookup/${account.address.toLowerCase()}?key=${FIREBASE_API_KEY}`
+      );
+      const data = await res.json();
+      const username = data.fields?.username?.stringValue;
+      
+      if (username) {
+        currentUser = { userId: account.address, username, walletAddress: account.address, provider: strategy };
+        localStorage.setItem('octsn_user', JSON.stringify(currentUser));
+        document.getElementById('header-username').textContent = '@' + username;
+        document.getElementById('signin-prompt').style.display = 'none';
+        document.getElementById('loading').style.display = 'flex';
+        await loadData();
+      } else {
+        window.location.href = '/';
+      }
+    } catch(e) {
+      console.error('Sign in error:', e.message);
+    }
+  };
+
+  init();
+</script>
+
+</body>
+</html>
