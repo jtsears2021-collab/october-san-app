@@ -697,8 +697,9 @@
 
     recordTimer = setInterval(() => {
       recordSeconds++;
-      const m = Math.floor(recordSeconds / 60);
-      const s = recordSeconds % 60;
+      const remaining = 30 - recordSeconds;
+      const m = Math.floor(remaining / 60);
+      const s = remaining % 60;
       document.getElementById('record-timer').textContent = `${m}:${s.toString().padStart(2,'0')}`;
       if (recordSeconds >= 30) stopVideo(); // max 30 seconds
     }, 1000);
