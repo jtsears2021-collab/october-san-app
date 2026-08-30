@@ -467,7 +467,7 @@
       <div class="thumb" onclick="openSnap(${i})">
         ${nft.image_url
           ? nft.isVideo
-            ? `<video src="${nft.image_url}" muted playsinline style="width:100%;height:100%;object-fit:cover;"></video>`
+            ? `<video src="${nft.image_url}" muted playsinline loop preload="none" style="width:100%;height:100%;object-fit:cover;"></video>`
             : `<img src="${nft.image_url}" loading="lazy" />`
           : `<div class="thumb-placeholder">◆</div>`
         }
@@ -475,6 +475,21 @@
         ${nft.listed ? '<div class="thumb-listed"></div>' : ''}
       </div>
     `).join('');
+
+    // Intersection Observer for video thumbnails
+    const gridObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        const video = entry.target;
+        if (entry.isIntersecting) {
+          video.play().catch(() => {});
+        } else {
+          video.pause();
+          video.src = video.src;
+        }
+      });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.grid video').forEach(v => gridObserver.observe(v));
   };
 
   window.setFilter = function(f) {
