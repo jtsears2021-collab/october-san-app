@@ -572,33 +572,44 @@
   };
 
   window.openDatePicker = function() {
-    const dates = ['All Dates', ...availableDates];
+    const existing = document.getElementById('date-sheet');
+    if (existing) { existing.remove(); return; }
+    
     const sheet = document.createElement('div');
-    sheet.style.cssText = 'position:fixed;inset:0;background:rgba(8,10,14,0.85);z-index:600;display:flex;align-items:flex-end;';
+    sheet.id = 'date-sheet';
+    sheet.style.cssText = 'position:fixed;bottom:0;left:0;right:0;background:var(--card);border-radius:16px 16px 0 0;padding:1rem;z-index:600;max-height:50vh;overflow-y:auto;border-top:1px solid var(--faint);';
+    
+    const dates = ['All Dates', ...availableDates];
     sheet.innerHTML = `
-      <div style="background:var(--card);width:100%;border-radius:16px 16px 0 0;padding:1rem;">
-        <div style="font-size:9px;letter-spacing:2px;color:var(--muted);text-align:center;margin-bottom:1rem;">SELECT DATE</div>
-        ${dates.map((d, i) => `
-          <div onclick="selectDate('${i === 0 ? 'all' : d}', '${i === 0 ? 'ALL DATES' : d}', this.parentElement.parentElement)" 
-               style="padding:14px 16px;border-bottom:1px solid var(--faint);cursor:pointer;font-size:12px;letter-spacing:1px;color:var(--text);">
-            ${d}
-          </div>
-        `).join('')}
-        <div onclick="this.parentElement.parentElement.remove()" 
-             style="padding:14px 16px;cursor:pointer;font-size:12px;letter-spacing:1px;color:var(--red);text-align:center;">
-          CANCEL
+      <div style="width:40px;height:4px;background:var(--faint);border-radius:2px;margin:0 auto 1rem;"></div>
+      <div style="font-size:9px;letter-spacing:2px;color:var(--muted);text-align:center;margin-bottom:0.75rem;">SELECT DATE</div>
+      ${dates.map((d, i) => `
+        <div onclick="selectDate('${i === 0 ? 'all' : d}', '${i === 0 ? 'ALL DATES' : d}')" 
+             style="padding:12px 16px;border-bottom:1px solid var(--faint);cursor:pointer;font-size:11px;letter-spacing:1px;color:${currentDate === (i === 0 ? 'all' : d) ? 'var(--sky)' : 'var(--text)'};">
+          ${d}
         </div>
-      </div>
+      `).join('')}
     `;
+    
     document.body.appendChild(sheet);
+    
+    // Close on outside tap
+    setTimeout(() => {
+      document.addEventListener('click', function closeSheet(e) {
+        if (!sheet.contains(e.target) && e.target.id !== 'f-date') {
+          sheet.remove();
+          document.removeEventListener('click', closeSheet);
+        }
+      });
+    }, 100);
   };
 
-  window.selectDate = function(date, label, sheet) {
+  window.selectDate = function(date, label) {
     currentDate = date;
     document.getElementById('f-date').textContent = label + ' ▾';
-    sheet.remove();
+    document.getElementById('date-sheet')?.remove();
     renderGrid();
-  };
+  }
 
   // ─── SNAP SCROLL ──────────────────────────────────────────
   window.openSnap = function(startIndex) {
