@@ -805,10 +805,10 @@
       setStep('step-confirm', 'done');
 
       // Show success
-      const imageUrl = metadata.image.startsWith('ipfs://')
-        ? `https://${CLIENT_ID}.ipfscdn.io/ipfs/${metadata.image.slice(7)}`
-        : metadata.image;
-      showSuccess({ ...result, imageUrl });
+      const displayUrl = imageUrl.startsWith('ipfs://')
+        ? `https://${CLIENT_ID}.ipfscdn.io/ipfs/${imageUrl.slice(7)}`
+        : imageUrl;
+      showSuccess({ ...result, imageUrl: displayUrl });
 
     } catch(e) {
       console.error('Mint error:', e);
