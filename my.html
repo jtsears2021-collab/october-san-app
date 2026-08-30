@@ -534,10 +534,10 @@
       document.getElementById('snap-count').textContent = `${startIndex + 1} / ${snapNFTs.length}`;
     }, 50);
 
-    feed.addEventListener('scroll', () => {
+    feed.onscroll = () => {
       const idx = Math.round(feed.scrollTop / snapH);
       document.getElementById('snap-count').textContent = `${idx + 1} / ${snapNFTs.length}`;
-    });
+    };
   }
 
   // ─── SIGN IN ──────────────────────────────────────────────
