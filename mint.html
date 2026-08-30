@@ -743,47 +743,64 @@
   };
 
   // ─── MINT ─────────────────────────────────────────────────
-  window.mintMoment = async function() {
+    window.mintMoment = async function() {
     if (!capturedBlob || !currentUser) return;
 
     showScreen('minting-screen');
     setStep('step-upload', 'active');
 
     try {
-      // Upload to IPFS via Vercel API
-      const formData = new FormData();
-      formData.append('file', capturedBlob, capturedType === 'photo' ? 'moment.jpg' : 'moment.mp4');
-      formData.append('walletAddress', currentUser.walletAddress);
-      formData.append('username', currentUser.username);
-      formData.append('type', capturedType);
+      const { createThirdwebClient, upload } = await import('https://esm.sh/thirdweb@5.120.1');
+      const client = createThirdwebClient({ clientId: CLIENT_ID });
 
-      const uploadRes = await fetch('https://october-san.com/api/mint', {
-        method: 'POST',
-        body: formData,
+      // Upload media to IPFS
+      const file = new File([capturedBlob], capturedType === 'photo' ? 'moment.jpg' : 'moment.mp4', {
+        type: capturedType === 'photo' ? 'image/jpeg' : 'video/mp4'
       });
+      const mediaUri = await upload({ client, files: [file] });
 
-      if (!uploadRes.ok) throw new Error('Upload failed: ' + uploadRes.status);
+      // Create and upload metadata
+      const today = new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+      const metadata = {
+        name: `October-San ${capturedType === 'video' ? 'Video ' : ''}Moment · ${today}`,
+        description: `A fan-captured ${capturedType} moment. ${today} Collection.`,
+        image: mediaUri[0],
+      };
+      const metadataUri = await upload({ client, files: [new File([JSON.stringify(metadata)], 'metadata.json', { type: 'application/json' })] });
 
       setStep('step-upload', 'done');
       setStep('step-mint', 'active');
 
-      const result = await uploadRes.json();
+      // Call mint API
+      const mintRes = await fetch('https://october-san.com/api/mint', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          metadataURI: metadataUri[0],
+          recipientAddress: currentUser.walletAddress,
+        }),
+      });
+
+      if (!mintRes.ok) throw new Error('Mint failed: ' + mintRes.status);
+      const result = await mintRes.json();
 
       setStep('step-mint', 'done');
       setStep('step-confirm', 'active');
-
-      // Wait for confirmation
       await new Promise(r => setTimeout(r, 2000));
       setStep('step-confirm', 'done');
 
       // Show success
-      showSuccess(result);
+      const imageUrl = metadata.image.startsWith('ipfs://')
+        ? `https://${CLIENT_ID}.ipfscdn.io/ipfs/${metadata.image.slice(7)}`
+        : metadata.image;
+      showSuccess({ ...result, imageUrl });
 
     } catch(e) {
       console.error('Mint error:', e);
       alert('Minting failed: ' + e.message + '\n\nPlease try again.');
       showScreen('preview-screen');
     }
+  };
   };
 
   function setStep(id, state) {
