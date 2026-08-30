@@ -759,7 +759,6 @@
       const file = new File([capturedBlob], capturedType === 'photo' ? 'moment.jpg' : 'moment.mp4', {
         type: capturedType === 'photo' ? 'image/jpeg' : 'video/mp4'
       });
-      const mediaUri = await upload({ client, files: [file] });
 
       // Upload media directly to Thirdweb IPFS
       const formData = new FormData();
@@ -798,7 +797,7 @@
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          metadataURI: metadataUri[0],
+          metadataURI: metadataUri,
           recipientAddress: currentUser.walletAddress,
         }),
       });
