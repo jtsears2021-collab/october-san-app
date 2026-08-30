@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="theme-color" content="#080A0E">
+  <title>October-San — Mint</title>
+  <link rel="manifest" href="/manifest.json">
+  <link rel="apple-touch-icon" href="/icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Mono:wght@300;400&family=Bebas+Neue&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --sky: #6BADE8;
+      --black: #080A0E;
+      --card: #111620;
+      --text: #E8EDF5;
+      --muted: #6B7A99;
+      --faint: #2A3347;
+      --green: #6BE8A0;
+      --red: #E86B6B;
+    }
+    html, body {
+      height: 100%;
+      background: #000;
+      color: var(--text);
+      font-family: 'DM Mono', monospace;
+      overscroll-behavior: none;
+    }
+
+    /* ─── SCREENS ─── */
+    .screen {
+      position: fixed;
+      inset: 0;
+      display: none;
+      flex-direction: column;
+    }
+    .screen.active { display: flex; }
+
+    /* ─── CAMERA SCREEN ─── */
+    #camera-screen { background: #000; }
+    #camera-video {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .camera-overlay {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: env(safe-area-inset-top, 20px) 0 env(safe-area-inset-bottom, 20px);
+    }
+    .camera-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 20px;
+      background: linear-gradient(rgba(0,0,0,0.5), transparent);
+    }
+    .camera-back {
+      background: rgba(0,0,0,0.5);
+      border: none;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 18px;
+      cursor: pointer;
+    }
+    .camera-logo {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-size: 1.2rem;
+      color: white;
+    }
+    .camera-logo span { color: var(--sky); }
+    .camera-flip {
+      background: rgba(0,0,0,0.5);
+      border: none;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 18px;
+      cursor: pointer;
+    }
+    .camera-bottom {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      gap: 40px;
+      background: linear-gradient(transparent, rgba(0,0,0,0.7));
+    }
+    .camera-mode {
+      display: flex;
+      gap: 20px;
+      margin-bottom: 20px;
+      justify-content: center;
+    }
+    .mode-btn {
+      background: none;
+      border: none;
+      color: rgba(255,255,255,0.6);
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 2px;
+      cursor: pointer;
+      padding: 4px 0;
+    }
+    .mode-btn.active {
+      color: white;
+      border-bottom: 1px solid var(--sky);
+    }
+    .shutter-btn {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      background: transparent;
+      border: 3px solid white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      position: relative;
+    }
+    .shutter-inner {
+      width: 58px;
+      height: 58px;
+      border-radius: 50%;
+      background: white;
+      transition: transform 0.1s;
+    }
+    .shutter-btn:active .shutter-inner { transform: scale(0.9); }
+    .shutter-btn.recording .shutter-inner {
+      border-radius: 8px;
+      background: var(--red);
+      width: 28px;
+      height: 28px;
+    }
+    .record-timer {
+      color: var(--red);
+      font-size: 12px;
+      letter-spacing: 2px;
+      position: absolute;
+      top: -24px;
+      display: none;
+    }
+    .record-timer.visible { display: block; }
+
+    /* ─── GEOFENCE CHECK ─── */
+    #geo-screen {
+      background: var(--black);
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 2rem;
+    }
+    .geo-icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+    }
+    .geo-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.4rem;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.5rem;
+    }
+    .geo-text {
+      color: var(--muted);
+      font-size: 10px;
+      letter-spacing: 1px;
+      line-height: 1.8;
+      margin-bottom: 2rem;
+    }
+    .geo-btn {
+      background: var(--sky);
+      color: var(--black);
+      border: none;
+      border-radius: 4px;
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      padding: 14px 32px;
+      cursor: pointer;
+      width: 100%;
+      max-width: 320px;
+      margin-bottom: 12px;
+    }
+    .geo-skip {
+      background: none;
+      border: none;
+      color: var(--muted);
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 1px;
+      cursor: pointer;
+    }
+
+    /* ─── PREVIEW SCREEN ─── */
+    #preview-screen { background: #000; }
+    #preview-media {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    #preview-video {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: none;
+    }
+    .preview-overlay {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: env(safe-area-inset-top, 20px) 0 env(safe-area-inset-bottom, 20px);
+    }
+    .preview-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 20px;
+      background: linear-gradient(rgba(0,0,0,0.5), transparent);
+    }
+    .preview-retake {
+      background: rgba(0,0,0,0.5);
+      border: 1px solid rgba(255,255,255,0.3);
+      border-radius: 20px;
+      color: white;
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 2px;
+      padding: 8px 16px;
+      cursor: pointer;
+    }
+    .preview-bottom {
+      padding: 20px;
+      background: linear-gradient(transparent, rgba(0,0,0,0.8));
+    }
+    .preview-info {
+      text-align: center;
+      margin-bottom: 16px;
+    }
+    .preview-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-size: 1.2rem;
+      color: white;
+      margin-bottom: 4px;
+    }
+    .preview-meta {
+      font-size: 9px;
+      letter-spacing: 2px;
+      color: rgba(255,255,255,0.6);
+    }
+    .mint-btn {
+      width: 100%;
+      background: var(--sky);
+      color: var(--black);
+      border: none;
+      border-radius: 4px;
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      padding: 16px;
+      cursor: pointer;
+    }
+    .mint-btn:disabled { opacity: 0.5; }
+
+    /* ─── MINTING SCREEN ─── */
+    #minting-screen {
+      background: var(--black);
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 2rem;
+    }
+    .minting-icon {
+      box-shadow: 0 0 0 1px var(--faint), 0 0 40px rgba(107,173,232,0.8);
+      border-radius: 22px;
+      margin-bottom: 2rem;
+      animation: pulse 2s ease-in-out infinite;
+    }
+    .minting-icon img {
+      width: 90px;
+      height: 90px;
+      border-radius: 22px;
+      display: block;
+    }
+    @keyframes pulse {
+      0%, 100% { box-shadow: 0 0 0 1px var(--faint), 0 0 40px rgba(107,173,232,0.8); }
+      50% { box-shadow: 0 0 0 1px var(--sky), 0 0 60px rgba(107,173,232,1); }
+    }
+    .minting-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.4rem;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.5rem;
+    }
+    .minting-text {
+      color: var(--muted);
+      font-size: 10px;
+      letter-spacing: 2px;
+      line-height: 1.8;
+    }
+    .minting-steps {
+      margin-top: 2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      width: 100%;
+      max-width: 280px;
+    }
+    .minting-step {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 10px;
+      letter-spacing: 1px;
+      color: var(--muted);
+    }
+    .minting-step.done { color: var(--green); }
+    .minting-step.active { color: var(--text); }
+    .step-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--faint);
+      flex-shrink: 0;
+    }
+    .minting-step.done .step-dot { background: var(--green); }
+    .minting-step.active .step-dot {
+      background: var(--sky);
+      box-shadow: 0 0 6px var(--sky);
+      animation: blink 1s ease-in-out infinite;
+    }
+    @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+    /* ─── SUCCESS SCREEN ─── */
+    #success-screen {
+      background: var(--black);
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 2rem;
+    }
+    .success-nft {
+      width: 200px;
+      height: 267px;
+      object-fit: cover;
+      border-radius: 8px;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 0 0 1px var(--faint), 0 0 30px rgba(107,173,232,0.5);
+    }
+    .success-title-text {
+      font-family: 'DM Mono', monospace;
+      font-size: 9px;
+      letter-spacing: 3px;
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+    .success-script {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-size: 1.8rem;
+      margin-bottom: 6px;
+    }
+    .success-script span { color: var(--sky); }
+    .success-sub {
+      font-size: 9px;
+      letter-spacing: 3px;
+      color: var(--text);
+      margin-bottom: 1.5rem;
+    }
+    .success-token {
+      font-size: 10px;
+      letter-spacing: 1px;
+      color: var(--muted);
+      margin-bottom: 2rem;
+    }
+    .success-token span { color: var(--sky); }
+    .btn-view {
+      width: 100%;
+      max-width: 320px;
+      background: var(--sky);
+      color: var(--black);
+      border: none;
+      border-radius: 4px;
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      padding: 14px;
+      cursor: pointer;
+      margin-bottom: 12px;
+      display: block;
+      text-align: center;
+      text-decoration: none;
+    }
+    .btn-mint-another {
+      width: 100%;
+      max-width: 320px;
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--faint);
+      border-radius: 4px;
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 2px;
+      padding: 14px;
+      cursor: pointer;
+    }
+
+    /* ─── NOT SIGNED IN ─── */
+    #signin-screen {
+      background: var(--black);
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 2rem;
+    }
+  </style>
+</head>
+<body>
+
+<!-- GEOFENCE CHECK SCREEN -->
+<div class="screen" id="geo-screen">
+  <div class="geo-icon">📍</div>
+  <div class="geo-title">VERIFY YOUR LOCATION</div>
+  <div class="geo-text">
+    October-San moments can only be minted<br>
+    inside the stadium.<br><br>
+    Allow location access to verify<br>
+    you're at the game.
+  </div>
+  <button class="geo-btn" onclick="checkLocation()">ALLOW LOCATION ACCESS</button>
+  <button class="geo-skip" onclick="startCamera()" id="dev-skip" style="display:none;">DEV: SKIP GEOFENCE</button>
+</div>
+
+<!-- CAMERA SCREEN -->
+<div class="screen" id="camera-screen">
+  <video id="camera-video" autoplay playsinline muted></video>
+  <canvas id="camera-canvas" style="display:none;"></canvas>
+  <div class="camera-overlay">
+    <div class="camera-top">
+      <button class="camera-back" onclick="goBack()">←</button>
+      <div class="camera-logo">October-<span>San</span>™</div>
+      <button class="camera-flip" onclick="flipCamera()">⟳</button>
+    </div>
+    <div>
+      <div class="camera-mode">
+        <button class="mode-btn active" onclick="setMode('photo')" id="mode-photo">PHOTO</button>
+        <button class="mode-btn" onclick="setMode('video')" id="mode-video">VIDEO</button>
+      </div>
+      <div class="camera-bottom">
+        <div style="width:72px;"></div>
+        <button class="shutter-btn" id="shutter-btn" onclick="captureMedia()">
+          <div class="shutter-inner"></div>
+          <div class="record-timer" id="record-timer">0:00</div>
+        </button>
+        <div style="width:72px;"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PREVIEW SCREEN -->
+<div class="screen" id="preview-screen">
+  <img id="preview-media" alt="Preview" />
+  <video id="preview-video" autoplay muted loop playsinline></video>
+  <div class="preview-overlay">
+    <div class="preview-top">
+      <button class="preview-retake" onclick="retake()">← RETAKE</button>
+      <div style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:1rem;color:white;">October-<span style="color:var(--sky);">San</span>™</div>
+    </div>
+    <div class="preview-bottom">
+      <div class="preview-info">
+        <div class="preview-title" id="preview-title">October-San Moment</div>
+        <div class="preview-meta" id="preview-meta">POLYGON BLOCKCHAIN · TODAY</div>
+      </div>
+      <button class="mint-btn" onclick="mintMoment()" id="mint-btn">MINT THIS MOMENT</button>
+    </div>
+  </div>
+</div>
+
+<!-- MINTING SCREEN -->
+<div class="screen" id="minting-screen">
+  <div class="minting-icon">
+    <img src="/icon.png" alt="October-San" />
+  </div>
+  <div class="minting-title">MINTING YOUR MOMENT</div>
+  <div class="minting-text">RECORDING ON THE<br>POLYGON BLOCKCHAIN</div>
+  <div class="minting-steps">
+    <div class="minting-step active" id="step-upload">
+      <div class="step-dot"></div>
+      UPLOADING TO IPFS
+    </div>
+    <div class="minting-step" id="step-mint">
+      <div class="step-dot"></div>
+      MINTING NFT
+    </div>
+    <div class="minting-step" id="step-confirm">
+      <div class="step-dot"></div>
+      CONFIRMING ON CHAIN
+    </div>
+  </div>
+</div>
+
+<!-- SUCCESS SCREEN -->
+<div class="screen" id="success-screen">
+  <img id="success-nft-img" class="success-nft" src="" alt="Your Moment" />
+  <div class="success-title-text">YOUR</div>
+  <div class="success-script">October-<span>San</span>™</div>
+  <div class="success-sub">MOMENT IS YOURS.</div>
+  <div class="success-token">TOKEN <span id="success-token-id">#—</span> · POLYGON BLOCKCHAIN</div>
+  <a href="/my" class="btn-view">VIEW IN MY COLLECTION</a>
+  <button class="btn-mint-another" onclick="mintAnother()">MINT ANOTHER MOMENT</button>
+</div>
+
+<!-- NOT SIGNED IN -->
+<div class="screen" id="signin-screen">
+  <div style="box-shadow:0 0 0 1px var(--faint),0 0 24px rgba(107,173,232,0.8);border-radius:22px;margin-bottom:1.5rem;">
+    <img src="/icon.png" style="width:80px;height:80px;border-radius:22px;display:block;" />
+  </div>
+  <div style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:1.6rem;margin-bottom:0.5rem;">October-<span style="color:var(--sky);">San</span>™</div>
+  <div style="font-size:9px;letter-spacing:2px;color:var(--muted);margin-bottom:2rem;">SIGN IN TO MINT YOUR MOMENT</div>
+  <a href="/" style="background:var(--sky);color:var(--black);border:none;border-radius:4px;font-family:'DM Mono',monospace;font-size:11px;font-weight:700;letter-spacing:2px;padding:14px 32px;cursor:pointer;text-decoration:none;">GO TO SIGN IN</a>
+</div>
+
+<script>
+  const DEV_MODE = true;
+  const CLIENT_ID = 'fb1460b2756706cc08a4f650e68fd526';
+  const STADIUM_LAT = 34.0739;
+  const STADIUM_LNG = -118.2400;
+  const STADIUM_RADIUS = 400; // meters
+
+  let currentUser = null;
+  let stream = null;
+  let facingMode = 'environment';
+  let captureMode = 'photo';
+  let capturedBlob = null;
+  let capturedType = 'photo';
+  let mediaRecorder = null;
+  let recordedChunks = [];
+  let recordTimer = null;
+  let recordSeconds = 0;
+
+  const stored = localStorage.getItem('octsn_user');
+  if (stored) currentUser = JSON.parse(stored);
+
+  function showScreen(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+  }
+
+  // ─── INIT ─────────────────────────────────────────────────
+  function init() {
+    if (!currentUser) {
+      showScreen('signin-screen');
+      return;
+    }
+    if (DEV_MODE) {
+      document.getElementById('dev-skip').style.display = 'block';
+    }
+    showScreen('geo-screen');
+  }
+
+  // ─── GEOFENCE ─────────────────────────────────────────────
+  window.checkLocation = function() {
+    if (DEV_MODE) {
+      startCamera();
+      return;
+    }
+    navigator.geolocation.getCurrentPosition(
+      pos => {
+        const dist = getDistance(pos.coords.latitude, pos.coords.longitude, STADIUM_LAT, STADIUM_LNG);
+        if (dist <= STADIUM_RADIUS) {
+          startCamera();
+        } else {
+          document.querySelector('.geo-text').innerHTML = 
+            'You must be inside Dodger Stadium<br>to mint an October-San moment.<br><br>' +
+            'Distance from stadium: ' + Math.round(dist) + 'm';
+        }
+      },
+      err => {
+        document.querySelector('.geo-text').innerHTML = 
+          'Location access denied.<br>Please enable location in Settings<br>to mint moments.';
+      },
+      { enableHighAccuracy: true, timeout: 10000 }
+    );
+  };
+
+  function getDistance(lat1, lng1, lat2, lng2) {
+    const R = 6371000;
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLng = (lng2 - lng1) * Math.PI / 180;
+    const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+              Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+              Math.sin(dLng/2) * Math.sin(dLng/2);
+    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+  }
+
+  // ─── CAMERA ───────────────────────────────────────────────
+  async function startCamera() {
+    showScreen('camera-screen');
+    try {
+      if (stream) stream.getTracks().forEach(t => t.stop());
+      stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode, width: { ideal: 1080 }, height: { ideal: 1920 } },
+        audio: captureMode === 'video'
+      });
+      document.getElementById('camera-video').srcObject = stream;
+    } catch(e) {
+      alert('Camera access denied. Please enable camera in Settings.');
+      goBack();
+    }
+  }
+
+  window.flipCamera = function() {
+    facingMode = facingMode === 'environment' ? 'user' : 'environment';
+    startCamera();
+  };
+
+  window.setMode = function(mode) {
+    captureMode = mode;
+    document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('mode-' + mode).classList.add('active');
+    // Restart stream for audio if switching to video
+    startCamera();
+  };
+
+  window.captureMedia = function() {
+    if (captureMode === 'photo') {
+      capturePhoto();
+    } else {
+      if (mediaRecorder && mediaRecorder.state === 'recording') {
+        stopVideo();
+      } else {
+        startVideo();
+      }
+    }
+  };
+
+  function capturePhoto() {
+    const video = document.getElementById('camera-video');
+    const canvas = document.getElementById('camera-canvas');
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    canvas.getContext('2d').drawImage(video, 0, 0);
+    canvas.toBlob(blob => {
+      capturedBlob = blob;
+      capturedType = 'photo';
+      showPreview();
+    }, 'image/jpeg', 0.92);
+  }
+
+  function startVideo() {
+    recordedChunks = [];
+    recordSeconds = 0;
+    const btn = document.getElementById('shutter-btn');
+    btn.classList.add('recording');
+    document.getElementById('record-timer').classList.add('visible');
+
+    mediaRecorder = new MediaRecorder(stream, { mimeType: 'video/mp4' });
+    mediaRecorder.ondataavailable = e => { if (e.data.size > 0) recordedChunks.push(e.data); };
+    mediaRecorder.onstop = () => {
+      capturedBlob = new Blob(recordedChunks, { type: 'video/mp4' });
+      capturedType = 'video';
+      showPreview();
+    };
+    mediaRecorder.start();
+
+    recordTimer = setInterval(() => {
+      recordSeconds++;
+      const m = Math.floor(recordSeconds / 60);
+      const s = recordSeconds % 60;
+      document.getElementById('record-timer').textContent = `${m}:${s.toString().padStart(2,'0')}`;
+      if (recordSeconds >= 30) stopVideo(); // max 30 seconds
+    }, 1000);
+  }
+
+  function stopVideo() {
+    if (mediaRecorder && mediaRecorder.state === 'recording') mediaRecorder.stop();
+    clearInterval(recordTimer);
+    document.getElementById('shutter-btn').classList.remove('recording');
+    document.getElementById('record-timer').classList.remove('visible');
+  }
+
+  // ─── PREVIEW ──────────────────────────────────────────────
+  function showPreview() {
+    if (stream) stream.getTracks().forEach(t => t.stop());
+    showScreen('preview-screen');
+
+    const url = URL.createObjectURL(capturedBlob);
+    const today = new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+
+    if (capturedType === 'photo') {
+      document.getElementById('preview-media').src = url;
+      document.getElementById('preview-media').style.display = 'block';
+      document.getElementById('preview-video').style.display = 'none';
+      document.getElementById('preview-title').textContent = 'October-San Moment · ' + today;
+    } else {
+      document.getElementById('preview-video').src = url;
+      document.getElementById('preview-video').style.display = 'block';
+      document.getElementById('preview-media').style.display = 'none';
+      document.getElementById('preview-title').textContent = 'October-San Video Moment · ' + today;
+    }
+    document.getElementById('preview-meta').textContent = 'POLYGON BLOCKCHAIN · ' + today.toUpperCase();
+  }
+
+  window.retake = function() {
+    capturedBlob = null;
+    startCamera();
+  };
+
+  // ─── MINT ─────────────────────────────────────────────────
+  window.mintMoment = async function() {
+    if (!capturedBlob || !currentUser) return;
+
+    showScreen('minting-screen');
+    setStep('step-upload', 'active');
+
+    try {
+      // Upload to IPFS via Vercel API
+      const formData = new FormData();
+      formData.append('file', capturedBlob, capturedType === 'photo' ? 'moment.jpg' : 'moment.mp4');
+      formData.append('walletAddress', currentUser.walletAddress);
+      formData.append('username', currentUser.username);
+      formData.append('type', capturedType);
+
+      const uploadRes = await fetch('https://october-san.com/api/mint', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!uploadRes.ok) throw new Error('Upload failed: ' + uploadRes.status);
+
+      setStep('step-upload', 'done');
+      setStep('step-mint', 'active');
+
+      const result = await uploadRes.json();
+
+      setStep('step-mint', 'done');
+      setStep('step-confirm', 'active');
+
+      // Wait for confirmation
+      await new Promise(r => setTimeout(r, 2000));
+      setStep('step-confirm', 'done');
+
+      // Show success
+      showSuccess(result);
+
+    } catch(e) {
+      console.error('Mint error:', e);
+      alert('Minting failed: ' + e.message + '\n\nPlease try again.');
+      showScreen('preview-screen');
+    }
+  };
+
+  function setStep(id, state) {
+    const el = document.getElementById(id);
+    el.className = 'minting-step ' + state;
+  }
+
+  function showSuccess(result) {
+    showScreen('success-screen');
+    document.getElementById('success-token-id').textContent = '#' + (result.tokenId || '—');
+    if (result.imageUrl) {
+      document.getElementById('success-nft-img').src = result.imageUrl;
+    } else {
+      document.getElementById('success-nft-img').src = '/icon.png';
+    }
+  }
+
+  window.mintAnother = function() {
+    capturedBlob = null;
+    init();
+  };
+
+  window.goBack = function() {
+    if (stream) stream.getTracks().forEach(t => t.stop());
+    window.location.href = '/';
+  };
+
+  init();
+</script>
+
+</body>
+</html>
