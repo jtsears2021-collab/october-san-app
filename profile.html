@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="theme-color" content="#080A0E">
+  <title>October-San — Profile</title>
+  <link rel="manifest" href="/manifest.json">
+  <link rel="apple-touch-icon" href="/icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Mono:wght@300;400&family=Bebas+Neue&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --sky: #6BADE8;
+      --black: #080A0E;
+      --dark: #0D1117;
+      --card: #111620;
+      --card2: #161D2B;
+      --text: #E8EDF5;
+      --muted: #6B7A99;
+      --faint: #2A3347;
+      --green: #6BE8A0;
+      --red: #E86B6B;
+      --orange: #E8A96B;
+    }
+    html, body {
+      height: 100%;
+      background: var(--black);
+      color: var(--text);
+      font-family: 'DM Mono', monospace;
+      overscroll-behavior: none;
+    }
+    #app {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      height: 100dvh;
+      overflow: hidden;
+    }
+
+    /* ─── HEADER ─── */
+    #header {
+      flex-shrink: 0;
+      background: var(--black);
+      border-bottom: 1px solid var(--faint);
+      padding: 12px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .logo {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-size: 1.3rem;
+      color: var(--text);
+      text-decoration: none;
+    }
+    .logo span { color: var(--sky); }
+    .header-title { font-size: 9px; letter-spacing: 2px; color: var(--muted); }
+
+    /* ─── SCROLL CONTENT ─── */
+    #content {
+      flex: 1;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      padding-bottom: 80px;
+    }
+
+    /* ─── PROFILE HERO ─── */
+    .profile-hero {
+      padding: 24px 16px 16px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      border-bottom: 1px solid var(--faint);
+    }
+    .avatar {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: var(--card);
+      border: 2px solid var(--sky);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--sky);
+      flex-shrink: 0;
+      cursor: pointer;
+      position: relative;
+    }
+    .avatar-edit {
+      position: absolute;
+      bottom: -2px;
+      right: -2px;
+      width: 20px;
+      height: 20px;
+      background: var(--sky);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      color: var(--black);
+    }
+    .profile-info { flex: 1; }
+    .profile-username {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: 1px;
+      margin-bottom: 4px;
+    }
+    .profile-joined {
+      font-size: 9px;
+      letter-spacing: 1px;
+      color: var(--muted);
+    }
+
+    /* ─── STATS ROW ─── */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      border-bottom: 1px solid var(--faint);
+    }
+    .stat-item {
+      padding: 16px;
+      text-align: center;
+      border-right: 1px solid var(--faint);
+    }
+    .stat-item:last-child { border-right: none; }
+    .stat-num {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.6rem;
+      color: var(--sky);
+      letter-spacing: 0.05em;
+    }
+    .stat-label {
+      font-size: 8px;
+      letter-spacing: 1.5px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    /* ─── WALLET CARD ─── */
+    .section-label {
+      font-size: 9px;
+      letter-spacing: 2px;
+      color: var(--muted);
+      padding: 16px 16px 8px;
+    }
+    .wallet-card {
+      margin: 0 16px 16px;
+      background: var(--card);
+      border: 1px solid var(--faint);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    .wallet-top {
+      padding: 16px;
+      background: linear-gradient(135deg, var(--card), var(--card2));
+      border-bottom: 1px solid var(--faint);
+    }
+    .wallet-network {
+      font-size: 8px;
+      letter-spacing: 2px;
+      color: var(--muted);
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .network-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 6px var(--green);
+    }
+    .wallet-address-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+    .wallet-address {
+      font-size: 13px;
+      color: var(--text);
+      letter-spacing: 0.5px;
+    }
+    .copy-btn {
+      background: var(--faint);
+      border: none;
+      border-radius: 4px;
+      color: var(--muted);
+      font-size: 10px;
+      padding: 4px 8px;
+      cursor: pointer;
+      font-family: 'DM Mono', monospace;
+      letter-spacing: 1px;
+    }
+    .copy-btn:active { background: var(--sky); color: var(--black); }
+    .wallet-balance {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2.4rem;
+      color: var(--text);
+      letter-spacing: 0.05em;
+      margin-bottom: 4px;
+    }
+    .wallet-balance-usd {
+      font-size: 11px;
+      color: var(--muted);
+      letter-spacing: 1px;
+    }
+
+    /* ─── WALLET ACTIONS ─── */
+    .wallet-actions {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      padding: 12px 8px;
+      gap: 4px;
+    }
+    .wallet-action {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 4px;
+      cursor: pointer;
+      border: none;
+      background: none;
+      font-family: 'DM Mono', monospace;
+      color: var(--text);
+      text-decoration: none;
+    }
+    .wallet-action:active { opacity: 0.7; }
+    .action-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: var(--card2);
+      border: 1px solid var(--faint);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+    }
+    .action-label {
+      font-size: 8px;
+      letter-spacing: 1.5px;
+      color: var(--muted);
+    }
+
+    /* ─── QR MODAL ─── */
+    #qr-modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(8,10,14,0.9);
+      z-index: 600;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+    #qr-modal.visible { display: flex; }
+    .qr-box {
+      background: var(--card);
+      border: 1px solid var(--faint);
+      border-radius: 12px;
+      padding: 2rem;
+      text-align: center;
+      width: 100%;
+      max-width: 320px;
+    }
+    .qr-title {
+      font-size: 9px;
+      letter-spacing: 2px;
+      color: var(--muted);
+      margin-bottom: 1rem;
+    }
+    #qr-canvas { border-radius: 8px; margin-bottom: 1rem; }
+    .qr-address {
+      font-size: 10px;
+      color: var(--sky);
+      word-break: break-all;
+      margin-bottom: 1rem;
+    }
+    .qr-close {
+      background: var(--faint);
+      border: none;
+      border-radius: 4px;
+      color: var(--text);
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 2px;
+      padding: 10px 24px;
+      cursor: pointer;
+    }
+
+    /* ─── SEND MODAL ─── */
+    #send-modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(8,10,14,0.9);
+      z-index: 600;
+      display: none;
+      align-items: flex-end;
+      padding: 0;
+    }
+    #send-modal.visible { display: flex; }
+    .send-sheet {
+      background: var(--card);
+      border-radius: 16px 16px 0 0;
+      padding: 1.5rem;
+      width: 100%;
+      border-top: 1px solid var(--faint);
+    }
+    .send-title {
+      font-size: 9px;
+      letter-spacing: 2px;
+      color: var(--muted);
+      text-align: center;
+      margin-bottom: 1rem;
+    }
+    .send-input {
+      background: var(--black);
+      border: 1px solid var(--faint);
+      border-radius: 4px;
+      color: var(--text);
+      font-family: 'DM Mono', monospace;
+      font-size: 13px;
+      padding: 12px;
+      width: 100%;
+      outline: none;
+      margin-bottom: 12px;
+    }
+    .send-input:focus { border-color: var(--sky); }
+    .send-btn {
+      background: var(--sky);
+      color: var(--black);
+      border: none;
+      border-radius: 4px;
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      padding: 14px;
+      width: 100%;
+      cursor: pointer;
+      margin-bottom: 8px;
+    }
+    .send-cancel {
+      background: transparent;
+      border: 1px solid var(--faint);
+      border-radius: 4px;
+      color: var(--muted);
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 2px;
+      padding: 12px;
+      width: 100%;
+      cursor: pointer;
+    }
+
+    /* ─── SETTINGS ─── */
+    .settings-card {
+      margin: 0 16px 16px;
+      background: var(--card);
+      border: 1px solid var(--faint);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    .settings-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--faint);
+      cursor: pointer;
+    }
+    .settings-item:last-child { border-bottom: none; }
+    .settings-item:active { background: var(--card2); }
+    .settings-label { font-size: 11px; letter-spacing: 1px; color: var(--text); }
+    .settings-value { font-size: 10px; color: var(--muted); }
+    .settings-arrow { color: var(--muted); font-size: 12px; }
+    .settings-danger { color: var(--red); }
+
+    /* ─── SIGN IN PROMPT ─── */
+    #signin-prompt {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      flex: 1;
+      gap: 1rem;
+      padding: 2rem;
+      text-align: center;
+    }
+    .btn-signin {
+      background: #fff; color: #000; border: 1px solid #000;
+      border-radius: 6px; width: 100%; max-width: 280px; height: 44px;
+      font-family: -apple-system, sans-serif; font-size: 15px;
+      cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .btn-signin-google {
+      background: transparent; color: var(--text); border: 1px solid var(--faint);
+      border-radius: 6px; width: 100%; max-width: 280px; height: 44px;
+      font-family: 'DM Mono', monospace; font-size: 13px;
+      cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+
+    /* ─── TAB BAR ─── */
+    #tab-bar {
+      flex-shrink: 0; display: flex; background: var(--black);
+      border-top: 1px solid var(--faint);
+      padding-bottom: env(safe-area-inset-bottom);
+    }
+    .tab {
+      flex: 1; display: flex; flex-direction: column; align-items: center;
+      padding: 10px 0; cursor: pointer; border: none; background: none;
+      color: var(--sky); font-family: 'DM Mono', monospace;
+      font-size: 9px; letter-spacing: 1.5px; gap: 4px; text-decoration: none;
+    }
+    .tab.active { color: var(--text); }
+    .tab-icon { font-size: 18px; }
+
+    .toast {
+      position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%);
+      background: var(--card); border: 1px solid var(--sky);
+      border-radius: 4px; color: var(--sky); font-size: 10px;
+      letter-spacing: 1px; padding: 8px 16px; display: none; z-index: 700;
+      white-space: nowrap;
+    }
+    .toast.visible { display: block; }
+  </style>
+</head>
+<body>
+
+<div id="app">
+  <div id="header">
+    <a href="/" class="logo">October-<span>San</span>™</a>
+    <span class="header-title">PROFILE</span>
+  </div>
+
+  <div id="content">
+
+    <!-- SIGN IN PROMPT -->
+    <div id="signin-prompt" style="display:none;">
+      <div style="color:var(--muted);font-size:11px;letter-spacing:1px;margin-bottom:1rem;">SIGN IN TO VIEW YOUR PROFILE</div>
+      <button class="btn-signin" onclick="signIn('apple')">
+        <svg width="16" height="20" viewBox="0 0 18 22" fill="black"><path d="M14.8 11.3c0-2.9 2.4-4.3 2.5-4.4-1.4-2-3.5-2.3-4.2-2.3-1.8-.2-3.5 1-4.4 1-.9 0-2.3-1-3.8-1-1.9 0-3.7 1.1-4.7 2.9-2 3.5-.5 8.6 1.4 11.5 1 1.4 2.1 2.9 3.6 2.8 1.4-.1 2-.9 3.7-.9 1.7 0 2.2.9 3.7.9 1.5 0 2.5-1.4 3.5-2.8.7-1 1.3-2.1 1.6-3.2-3.5-1.4-3.4-5.5-.9-5.5zM12.4 3.2c.8-1 1.3-2.3 1.2-3.7-1.2.1-2.6.8-3.4 1.8-.8.9-1.4 2.2-1.2 3.5 1.3.1 2.6-.6 3.4-1.6z"/></svg>
+        Sign in with Apple
+      </button>
+      <button class="btn-signin-google" onclick="signIn('google')">G &nbsp; Sign in with Google</button>
+    </div>
+
+    <!-- PROFILE CONTENT -->
+    <div id="profile-content" style="display:none;">
+
+      <!-- PROFILE HERO -->
+      <div class="profile-hero">
+        <div class="avatar" id="avatar" onclick="changeAvatar()">
+          <span id="avatar-letter">?</span>
+          <div class="avatar-edit">✎</div>
+        </div>
+        <div class="profile-info">
+          <div class="profile-username" id="profile-username">—</div>
+          <div class="profile-joined" id="profile-joined">MEMBER SINCE —</div>
+        </div>
+      </div>
+
+      <!-- STATS -->
+      <div class="stats-row">
+        <div class="stat-item">
+          <div class="stat-num" id="stat-owned">—</div>
+          <div class="stat-label">OWNED</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num" id="stat-listed">—</div>
+          <div class="stat-label">LISTED</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num" id="stat-minted">—</div>
+          <div class="stat-label">MINTED</div>
+        </div>
+      </div>
+
+      <!-- WALLET -->
+      <div class="section-label">OCTOBER-SAN WALLET</div>
+      <div class="wallet-card">
+        <div class="wallet-top">
+          <div class="wallet-network">
+            <div class="network-dot"></div>
+            POLYGON MAINNET
+          </div>
+          <div class="wallet-address-row">
+            <span class="wallet-address" id="wallet-address">—</span>
+            <button class="copy-btn" onclick="copyAddress()" id="copy-btn">COPY</button>
+          </div>
+          <div class="wallet-balance" id="wallet-balance">— POL</div>
+          <div class="wallet-balance-usd" id="wallet-balance-usd">≈ $— USD</div>
+        </div>
+        <div class="wallet-actions">
+          <button class="wallet-action" onclick="showSend()">
+            <div class="action-icon">↑</div>
+            <span class="action-label">SEND</span>
+          </button>
+          <button class="wallet-action" onclick="showReceive()">
+            <div class="action-icon">↓</div>
+            <span class="action-label">RECEIVE</span>
+          </button>
+          <button class="wallet-action" onclick="buyPOL()">
+            <div class="action-icon">＋</div>
+            <span class="action-label">BUY POL</span>
+          </button>
+          <a class="wallet-action" href="https://polygonscan.com/address/" id="polygonscan-link" target="_blank">
+            <div class="action-icon">◈</div>
+            <span class="action-label">EXPLORER</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- SETTINGS -->
+      <div class="section-label">ACCOUNT</div>
+      <div class="settings-card">
+        <div class="settings-item" onclick="viewOnPolygonscan()">
+          <span class="settings-label">View on Polygonscan</span>
+          <span class="settings-arrow">↗</span>
+        </div>
+        <div class="settings-item" onclick="copyAddress()">
+          <span class="settings-label">Copy Wallet Address</span>
+          <span class="settings-value" id="settings-address">—</span>
+        </div>
+        <div class="settings-item" onclick="signOut()">
+          <span class="settings-label settings-danger">Sign Out</span>
+          <span class="settings-arrow">→</span>
+        </div>
+        <div class="settings-item" onclick="deleteAccount()">
+          <span class="settings-label settings-danger">Delete Account</span>
+          <span class="settings-arrow" style="color:var(--red);">→</span>
+        </div>
+      </div>
+
+      <div style="padding: 0 16px 16px;">
+        <div style="font-size:8px;letter-spacing:1px;color:var(--muted);text-align:center;line-height:1.8;">
+          October-San will never ask you to send POL to any address.<br>
+          All transactions happen automatically through the app.
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div id="tab-bar">
+    <a class="tab" href="/"><span class="tab-icon">◉</span><span>HOME</span></a>
+    <a class="tab" href="/daily"><span class="tab-icon">⊞</span><span>DAILY</span></a>
+    <a class="tab" href="/my"><span class="tab-icon">◯</span><span>MY</span></a>
+    <a class="tab active" href="/profile"><span class="tab-icon">⊙</span><span>PROFILE</span></a>
+  </div>
+</div>
+
+<!-- QR RECEIVE MODAL -->
+<div id="qr-modal">
+  <div class="qr-box">
+    <div class="qr-title">YOUR OCTOBER-SAN WALLET</div>
+    <canvas id="qr-canvas" width="200" height="200"></canvas>
+    <div class="qr-address" id="qr-address">—</div>
+    <button class="qr-close" onclick="closeQR()">CLOSE</button>
+  </div>
+</div>
+
+<!-- SEND MODAL -->
+<div id="send-modal">
+  <div class="send-sheet">
+    <div class="send-title">SEND POL</div>
+    <input type="text" class="send-input" id="send-address" placeholder="Recipient address (0x...)" />
+    <input type="number" class="send-input" id="send-amount" placeholder="Amount (POL)" inputmode="decimal" />
+    <button class="send-btn" onclick="executeSend()">OPEN IN METAMASK</button>
+    <button class="send-cancel" onclick="closeSend()">CANCEL</button>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script type="module">
+  import { createThirdwebClient } from 'https://esm.sh/thirdweb@5.120.1';
+  import { inAppWallet } from 'https://esm.sh/thirdweb@5.120.1/wallets';
+  import { polygon } from 'https://esm.sh/thirdweb@5.120.1/chains';
+  import { ethers } from 'https://esm.sh/ethers@5.7.2';
+
+  const CLIENT_ID = 'fb1460b2756706cc08a4f650e68fd526';
+  const CONTRACT_ADDRESS = '0x397160Ad067BaaBa7f35Dd0b7A5C25F836b2539F';
+  const MARKETPLACE_ADDRESS = '0xef77CDF9Dc521563270B6aBba379dbc3d389C08c';
+  const FIREBASE_URL = 'https://firestore.googleapis.com/v1/projects/october-san-e3a33/databases/(default)/documents';
+  const FIREBASE_API_KEY = 'AIzaSyBX6hKfUBi8oXx9ew22-jLpL4SxQJKoRIg';
+  const POL_PRICE_USD = 0.07;
+
+  const client = createThirdwebClient({ clientId: CLIENT_ID });
+  let currentUser = null;
+  let walletAddress = '';
+
+  const stored = localStorage.getItem('octsn_user');
+  if (stored) currentUser = JSON.parse(stored);
+
+  async function init() {
+    if (!currentUser) {
+      document.getElementById('signin-prompt').style.display = 'flex';
+      return;
+    }
+    document.getElementById('profile-content').style.display = 'block';
+    walletAddress = currentUser.walletAddress || '';
+
+    // Set profile info
+    document.getElementById('profile-username').textContent = '@' + currentUser.username;
+    document.getElementById('avatar-letter').textContent = currentUser.username.charAt(0).toUpperCase();
+    document.getElementById('wallet-address').textContent = walletAddress.substring(0,6) + '...' + walletAddress.slice(-4);
+    document.getElementById('settings-address').textContent = walletAddress.substring(0,6) + '...' + walletAddress.slice(-4);
+    document.getElementById('polygonscan-link').href = `https://polygonscan.com/address/${walletAddress}`;
+    document.getElementById('qr-address').textContent = walletAddress;
+
+    // Join date from Firebase
+    try {
+      const res = await fetch(`${FIREBASE_URL}/users/${currentUser.userId}?key=${FIREBASE_API_KEY}`);
+      const data = await res.json();
+      if (data.fields?.joinDate?.stringValue) {
+        const date = new Date(data.fields.joinDate.stringValue);
+        document.getElementById('profile-joined').textContent = 'MEMBER SINCE ' + date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' }).toUpperCase();
+      }
+    } catch(e) {}
+
+    // Load balance and stats in parallel
+    loadBalance();
+    loadStats();
+  }
+
+  async function loadBalance() {
+    try {
+      const provider = new ethers.providers.JsonRpcProvider(`https://137.rpc.thirdweb.com/${CLIENT_ID}`);
+      const balance = await provider.getBalance(walletAddress);
+      const polBalance = parseFloat(ethers.utils.formatEther(balance));
+      const usdBalance = (polBalance * POL_PRICE_USD).toFixed(2);
+      document.getElementById('wallet-balance').textContent = polBalance.toFixed(4) + ' POL';
+      document.getElementById('wallet-balance-usd').textContent = '≈ $' + usdBalance + ' USD';
+    } catch(e) { console.log('Balance error:', e.message); }
+  }
+
+  async function loadStats() {
+    try {
+      // NFTs owned
+      const ownedRes = await fetch(
+        `https://polygon.insight.thirdweb.com/v1/nfts?owner_address=${walletAddress}&contract_address=${CONTRACT_ADDRESS}&chain=137`,
+        { headers: { 'x-client-id': CLIENT_ID } }
+      );
+      const ownedData = await ownedRes.json();
+      const owned = (ownedData.data || []).length;
+      document.getElementById('stat-owned').textContent = owned;
+
+      // NFTs listed
+      const provider = new ethers.providers.JsonRpcProvider(`https://137.rpc.thirdweb.com/${CLIENT_ID}`);
+      const marketAbi = [
+        'function getAllListings(uint256 _startId, uint256 _endId) external view returns (tuple(uint256 listingId, uint256 tokenId, uint256 quantity, uint256 pricePerToken, uint128 startTimestamp, uint128 endTimestamp, address listingCreator, address assetContract, address currency, uint8 tokenType, uint8 status, bool reserved)[] listings)',
+        'function totalListings() external view returns (uint256)',
+      ];
+      const marketplace = new ethers.Contract(MARKETPLACE_ADDRESS, marketAbi, provider);
+      const total = await marketplace.totalListings();
+      let listed = 0;
+      if (!total.eq(0)) {
+        const listings = await marketplace.getAllListings(0, total.sub(1));
+        const now = Math.floor(Date.now() / 1000);
+        listed = listings.filter(l =>
+          parseInt(l.status) === 1 &&
+          l.listingCreator.toLowerCase() === walletAddress.toLowerCase() &&
+          parseInt(l.endTimestamp) > now
+        ).length;
+      }
+      document.getElementById('stat-listed').textContent = listed;
+      document.getElementById('stat-minted').textContent = owned + listed; // approximation
+
+    } catch(e) { console.log('Stats error:', e.message); }
+  }
+
+  // ─── WALLET ACTIONS ───────────────────────────────────────
+  window.copyAddress = function() {
+    navigator.clipboard.writeText(walletAddress).then(() => {
+      showToast('✓ WALLET ADDRESS COPIED');
+      document.getElementById('copy-btn').textContent = '✓';
+      setTimeout(() => document.getElementById('copy-btn').textContent = 'COPY', 2000);
+    });
+  };
+
+  window.showReceive = function() {
+    // Generate simple QR code using canvas
+    document.getElementById('qr-modal').classList.add('visible');
+    generateQR(walletAddress);
+  };
+
+  window.closeQR = function() {
+    document.getElementById('qr-modal').classList.remove('visible');
+  };
+
+  function generateQR(text) {
+    // Simple QR placeholder — use a QR service
+    const canvas = document.getElementById('qr-canvas');
+    const ctx = canvas.getContext('2d');
+    const img = new Image();
+    img.onload = () => ctx.drawImage(img, 0, 0, 200, 200);
+    img.src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(text)}&bgcolor=111620&color=6BADE8&margin=10`;
+  }
+
+  window.showSend = function() {
+    document.getElementById('send-modal').classList.add('visible');
+  };
+
+  window.closeSend = function() {
+    document.getElementById('send-modal').classList.remove('visible');
+  };
+
+  window.executeSend = function() {
+    const toAddress = document.getElementById('send-address').value.trim();
+    const amount = document.getElementById('send-amount').value.trim();
+    if (!toAddress || !amount) { showToast('Enter address and amount'); return; }
+    // Open MetaMask with pre-filled data
+    window.location.href = `metamask://send?address=${toAddress}&amount=${amount}&chainId=137`;
+    setTimeout(() => {
+      window.open('https://metamask.io/download/', '_blank');
+    }, 1000);
+    closeSend();
+  };
+
+  window.buyPOL = function() {
+    // Transak works in California
+    const url = `https://global.transak.com/?apiKey=e8c7c40d-a7b2-4e1f-8e25-a07f54f2c93d&defaultCryptoCurrency=MATIC&walletAddress=${walletAddress}&networks=polygon`;
+    window.open(url, '_blank');
+  };
+
+  window.viewOnPolygonscan = function() {
+    window.open(`https://polygonscan.com/address/${walletAddress}`, '_blank');
+  };
+
+  window.changeAvatar = function() {
+    const colors = ['#6BADE8', '#6BE8A0', '#E86B6B', '#E8A96B', '#A96BE8', '#6BE8D4'];
+    const current = document.getElementById('avatar').style.borderColor || '#6BADE8';
+    const next = colors[(colors.indexOf(current) + 1) % colors.length];
+    document.getElementById('avatar').style.borderColor = next;
+    document.getElementById('avatar-letter').style.color = next;
+    showToast('AVATAR UPDATED');
+  };
+
+  // ─── ACCOUNT ──────────────────────────────────────────────
+  window.signOut = function() {
+    if (!confirm('Sign out of October-San?')) return;
+    localStorage.removeItem('octsn_user');
+    window.location.href = '/';
+  };
+
+  window.deleteAccount = async function() {
+    if (!confirm('Permanently delete your October-San account? Your NFTs will remain in your wallet.')) return;
+    try {
+      // Delete from Firebase
+      await fetch(`${FIREBASE_URL}/users/${currentUser.userId}?key=${FIREBASE_API_KEY}`, { method: 'DELETE' });
+      await fetch(`${FIREBASE_URL}/usernames/${currentUser.username}?key=${FIREBASE_API_KEY}`, { method: 'DELETE' });
+      await fetch(`${FIREBASE_URL}/walletLookup/${walletAddress.toLowerCase()}?key=${FIREBASE_API_KEY}`, { method: 'DELETE' });
+      localStorage.removeItem('octsn_user');
+      window.location.href = '/';
+    } catch(e) {
+      showToast('Error deleting account. Try again.');
+    }
+  };
+
+  // ─── SIGN IN ──────────────────────────────────────────────
+  window.signIn = async function(strategy) {
+    try {
+      const wallet = inAppWallet();
+      const account = await wallet.connect({ client, strategy, chain: polygon });
+      const res = await fetch(`${FIREBASE_URL}/walletLookup/${account.address.toLowerCase()}?key=${FIREBASE_API_KEY}`);
+      const data = await res.json();
+      const username = data.fields?.username?.stringValue;
+      if (username) {
+        currentUser = { userId: account.address, username, walletAddress: account.address, provider: strategy };
+        localStorage.setItem('octsn_user', JSON.stringify(currentUser));
+        document.getElementById('signin-prompt').style.display = 'none';
+        document.getElementById('profile-content').style.display = 'block';
+        init();
+      } else {
+        window.location.href = '/';
+      }
+    } catch(e) { console.error('Sign in error:', e.message); }
+  };
+
+  // ─── TOAST ────────────────────────────────────────────────
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('visible');
+    setTimeout(() => t.classList.remove('visible'), 2500);
+  }
+
+  init();
+</script>
+
+</body>
+</html>
