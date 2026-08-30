@@ -572,19 +572,31 @@
   };
 
   window.openDatePicker = function() {
-    const options = [
-      { text: 'All Dates', onPress: () => { currentDate = 'all'; document.getElementById('f-date').textContent = 'ALL DATES ▾'; renderGrid(); } },
-      ...availableDates.map(d => ({
-        text: d,
-        onPress: () => { currentDate = d; document.getElementById('f-date').textContent = d + ' ▾'; renderGrid(); }
-      }))
-    ];
-    // Simple alert-based picker
-    const choice = prompt('Select date:\n' + ['All Dates', ...availableDates].map((d, i) => `${i}: ${d}`).join('\n'));
-    if (choice === null) return;
-    const idx = parseInt(choice);
-    if (idx === 0) { currentDate = 'all'; document.getElementById('f-date').textContent = 'ALL DATES ▾'; }
-    else if (availableDates[idx - 1]) { currentDate = availableDates[idx - 1]; document.getElementById('f-date').textContent = availableDates[idx - 1] + ' ▾'; }
+    const dates = ['All Dates', ...availableDates];
+    const sheet = document.createElement('div');
+    sheet.style.cssText = 'position:fixed;inset:0;background:rgba(8,10,14,0.85);z-index:600;display:flex;align-items:flex-end;';
+    sheet.innerHTML = `
+      <div style="background:var(--card);width:100%;border-radius:16px 16px 0 0;padding:1rem;">
+        <div style="font-size:9px;letter-spacing:2px;color:var(--muted);text-align:center;margin-bottom:1rem;">SELECT DATE</div>
+        ${dates.map((d, i) => `
+          <div onclick="selectDate('${i === 0 ? 'all' : d}', '${i === 0 ? 'ALL DATES' : d}', this.parentElement.parentElement)" 
+               style="padding:14px 16px;border-bottom:1px solid var(--faint);cursor:pointer;font-size:12px;letter-spacing:1px;color:var(--text);">
+            ${d}
+          </div>
+        `).join('')}
+        <div onclick="this.parentElement.parentElement.remove()" 
+             style="padding:14px 16px;cursor:pointer;font-size:12px;letter-spacing:1px;color:var(--red);text-align:center;">
+          CANCEL
+        </div>
+      </div>
+    `;
+    document.body.appendChild(sheet);
+  };
+
+  window.selectDate = function(date, label, sheet) {
+    currentDate = date;
+    document.getElementById('f-date').textContent = label + ' ▾';
+    sheet.remove();
     renderGrid();
   };
 
