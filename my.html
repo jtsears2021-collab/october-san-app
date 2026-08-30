@@ -561,7 +561,7 @@
           video.play().catch(() => {});
         } else {
           video.pause();
-          video.currentTime = 0;
+          video.src = video.src;
         }
       });
     }, { threshold: 0.5 });
