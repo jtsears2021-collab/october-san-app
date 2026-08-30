@@ -766,12 +766,22 @@
 
       // Create and upload metadata
       const today = new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
-      const metadata = {
+      const imageUrl = mediaUri[0];
+      console.log('Media URI:', imageUrl);
+
+      const metadataObj = {
         name: `October-San ${capturedType === 'video' ? 'Video ' : ''}Moment · ${today}`,
         description: `A fan-captured ${capturedType} moment. ${today} Collection.`,
-        image: mediaUri[0],
+        image: imageUrl,
       };
-      const metadataUri = await upload({ client, files: [new File([JSON.stringify(metadata)], 'metadata.json', { type: 'application/json' })] });
+
+      const metadataFile = new File(
+        [JSON.stringify(metadataObj)],
+        'metadata.json',
+        { type: 'application/json' }
+      );
+      const metadataUri = await upload({ client, files: [metadataFile] });
+      console.log('Metadata URI:', metadataUri[0]);
 
       setStep('step-upload', 'done');
       setStep('step-mint', 'active');
