@@ -457,7 +457,7 @@
     you're at the game.
   </div>
   <button class="geo-btn" onclick="checkLocation()">ALLOW LOCATION ACCESS</button>
-  <button class="geo-skip" onclick="startCamera()" id="dev-skip" style="display:none;">DEV: SKIP GEOFENCE</button>
+  <button class="geo-skip" id="dev-skip" style="display:none;">DEV: SKIP GEOFENCE</button>
 </div>
 
 <!-- CAMERA SCREEN -->
@@ -583,7 +583,9 @@
       return;
     }
     if (DEV_MODE) {
-      document.getElementById('dev-skip').style.display = 'block';
+      const skipBtn = document.getElementById('dev-skip');
+      skipBtn.style.display = 'block';
+      skipBtn.addEventListener('click', () => window.startCamera());
     }
     showScreen('geo-screen');
   }
@@ -624,7 +626,7 @@
   }
 
   // ─── CAMERA ───────────────────────────────────────────────
-  async function startCamera() {
+  window.startCamera = async function() {
     showScreen('camera-screen');
     try {
       if (stream) stream.getTracks().forEach(t => t.stop());
