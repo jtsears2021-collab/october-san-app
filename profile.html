@@ -505,8 +505,8 @@
         </div>
         <div class="wallet-actions">
           <button class="wallet-action" onclick="showSend()">
-            <div class="action-icon">↑</div>
-            <span class="action-label">SEND</span>
+            <div class="action-icon">⇄</div>
+            <span class="action-label">TRANSFER</span>
           </button>
           <button class="wallet-action" onclick="showReceive()">
             <div class="action-icon">↓</div>
@@ -728,8 +728,33 @@
     document.getElementById('send-modal').classList.add('visible');
   };
 
-  window.closeSend = function() {
-    document.getElementById('send-modal').classList.remove('visible');
+  window.showSend = function() {
+    const existing = document.getElementById('transfer-sheet');
+    if (existing) { existing.remove(); return; }
+    
+    const sheet = document.createElement('div');
+    sheet.id = 'transfer-sheet';
+    sheet.style.cssText = 'position:fixed;bottom:0;left:0;right:0;background:var(--card);border-radius:16px 16px 0 0;padding:1.5rem;z-index:600;border-top:1px solid var(--faint);';
+    sheet.innerHTML = `
+      <div style="width:40px;height:4px;background:var(--faint);border-radius:2px;margin:0 auto 1rem;"></div>
+      <div style="font-size:9px;letter-spacing:2px;color:var(--muted);text-align:center;margin-bottom:1.5rem;">TRANSFER POL</div>
+      <input type="text" id="transfer-address" placeholder="Destination wallet address (0x...)" 
+             style="background:var(--black);border:1px solid var(--faint);border-radius:4px;color:var(--text);font-family:'DM Mono',monospace;font-size:13px;padding:12px;width:100%;outline:none;margin-bottom:12px;" />
+      <input type="number" id="transfer-amount" placeholder="Amount (POL)" inputmode="decimal"
+             style="background:var(--black);border:1px solid var(--faint);border-radius:4px;color:var(--text);font-family:'DM Mono',monospace;font-size:16px;padding:12px;width:100%;outline:none;margin-bottom:12px;" />
+      <div style="color:var(--muted);font-size:9px;letter-spacing:1px;text-align:center;margin-bottom:16px;">
+        Transfers POL from your October-San wallet.<br>This action cannot be undone.
+      </div>
+      <button id="transfer-btn" onclick="transfer()" 
+              style="width:100%;background:var(--sky);color:var(--black);border:none;border-radius:4px;font-family:'DM Mono',monospace;font-size:11px;font-weight:700;letter-spacing:2px;padding:14px;cursor:pointer;margin-bottom:8px;">
+        TRANSFER
+      </button>
+      <button onclick="document.getElementById('transfer-sheet').remove();"
+              style="width:100%;background:transparent;color:var(--muted);border:none;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1px;padding:8px;cursor:pointer;">
+        CANCEL
+      </button>
+    `;
+    document.body.appendChild(sheet);
   };
 
   window.executeSend = function() {
