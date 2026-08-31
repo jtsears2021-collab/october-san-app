@@ -446,28 +446,24 @@
       if (search && !nft.name?.toLowerCase().includes(search) && !nft.token_id.includes(search)) return false;
       return true;
     });
-
     filtered = filtered.sort((a, b) =>
       currentSort === 'newest'
         ? parseInt(b.token_id) - parseInt(a.token_id)
         : parseInt(a.token_id) - parseInt(b.token_id)
     );
-
     snapNFTs = filtered;
-
     if (filtered.length === 0) {
       document.getElementById('grid').style.display = 'none';
       document.getElementById('empty').style.display = 'flex';
       return;
     }
-
     document.getElementById('empty').style.display = 'none';
     document.getElementById('grid').style.display = 'grid';
     document.getElementById('grid').innerHTML = filtered.map((nft, i) => `
       <div class="thumb" onclick="openSnap(${i})">
         ${nft.image_url
           ? nft.isVideo
-            ? `<div class="thumb-placeholder" style="background:var(--black);">🎬<br><span style="font-size:8px;color:var(--muted);">#${nft.token_id}</span></div>`
+            ? `<video data-src="${nft.image_url}" muted playsinline loop preload="none" style="width:100%;height:100%;object-fit:cover;"></video>`
             : `<img src="${nft.image_url}" loading="lazy" />`
           : `<div class="thumb-placeholder">◆</div>`
         }
@@ -476,18 +472,22 @@
       </div>
     `).join('');
 
-    // Intersection Observer for video thumbnails
+    // Lazy load videos only when visible
     const gridObserver = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
         const video = entry.target;
         if (entry.isIntersecting) {
+          if (!video.src && video.dataset.src) {
+            video.src = video.dataset.src;
+          }
           video.play().catch(() => {});
         } else {
           video.pause();
-          video.src = video.src;
+          video.src = '';
+          video.load();
         }
       });
-    }, { threshold: 0.1 });
+    }, { threshold: 0.1, rootMargin: '50px' });
 
     document.querySelectorAll('.grid video').forEach(v => gridObserver.observe(v));
   };
