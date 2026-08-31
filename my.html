@@ -531,7 +531,8 @@
         ${nft.image_url
           ? nft.isVideo
             ? `<div style="width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--muted);gap:1rem;"><span style="font-size:4rem;">🎬</span><span style="font-size:11px;letter-spacing:2px;">VIDEO MOMENT</span></div>`
-            : `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:3rem;">◆</div>`
+            : `<img class="snap-card-media" src="${nft.image_url}" />`
+          : `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:3rem;">◆</div>`
         }
         <div class="snap-card-token">#${nft.token_id}</div>
         <div class="snap-card-overlay">
@@ -556,7 +557,6 @@
       const idx = Math.round(feed.scrollTop / snapH);
       document.getElementById('snap-count').textContent = `${idx + 1} / ${snapNFTs.length}`;
     };
-    
   // Auto-play videos when visible
     const videoObserver = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
