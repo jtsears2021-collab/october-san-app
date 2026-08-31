@@ -833,13 +833,9 @@
     sheet.innerHTML = `
       <div style="width:40px;height:4px;background:var(--faint);border-radius:2px;margin:0 auto 1rem;"></div>
       <div style="font-size:9px;letter-spacing:2px;color:var(--muted);text-align:center;margin-bottom:1.5rem;">BUY POL</div>
-      <button onclick="window.open('https://global.transak.com/?defaultCryptoCurrency=POL&walletAddress=${walletAddress}&networks=polygon','_blank');document.getElementById('buypol-sheet').remove();"
+      <button onclick="window.open('https://www.coinbase.com/how-to-buy/polygon','_blank');document.getElementById('buypol-sheet').remove();"
               style="width:100%;background:var(--card2);border:1px solid var(--faint);border-radius:4px;color:var(--text);font-family:'DM Mono',monospace;font-size:11px;font-weight:700;letter-spacing:2px;padding:14px;cursor:pointer;margin-bottom:8px;text-align:left;">
-        TRANSAK ↗ <span style="color:var(--muted);font-size:9px;font-weight:400;">· BUY WITH CARD</span>
-      </button>
-      <button onclick="window.open('https://www.coinbase.com/price/polygon','_blank');document.getElementById('buypol-sheet').remove();"
-              style="width:100%;background:var(--card2);border:1px solid var(--faint);border-radius:4px;color:var(--text);font-family:'DM Mono',monospace;font-size:11px;font-weight:700;letter-spacing:2px;padding:14px;cursor:pointer;margin-bottom:8px;text-align:left;">
-        COINBASE ↗ <span style="color:var(--muted);font-size:9px;font-weight:400;">· BUY WITH COINBASE</span>
+        BUY POL ON COINBASE ↗ <span style="color:var(--muted);font-size:9px;font-weight:400;">· opens coinbase</span>
       </button>
       <button onclick="document.getElementById('buypol-sheet').remove();"
               style="width:100%;background:transparent;color:var(--muted);border:none;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1px;padding:8px;cursor:pointer;">
