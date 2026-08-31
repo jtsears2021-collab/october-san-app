@@ -567,15 +567,18 @@
           video.play().catch(() => {});
         } else {
           video.pause();
-          video.src = '';
-          video.load();
         }
       });
-    }, { threshold: 0.1, rootMargin: '50px' });
+    }, { threshold: 0.1, rootMargin: '100px' });
 
-    document.querySelectorAll('.grid video').forEach(v => gridObserver.observe(v));
+    let videoCount = 0;
+    document.querySelectorAll('.grid video').forEach(v => {
+      if (videoCount < 12) {
+        gridObserver.observe(v);
+        videoCount++;
+      }
+    });
   };
-
   window.setFilter = function(f) {
     currentFilter = f;
     document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
