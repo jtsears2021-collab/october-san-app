@@ -43,51 +43,50 @@
     }
 
     /* ─── MINT HERO (scrollable) ─── */
-    #mint-hero {
-      flex-shrink: 0;
+#mint-hero {
       background: var(--black);
-      padding: 32px 16px 24px;
+      padding: 40px 16px 32px;
       display: flex;
       flex-direction: column;
       align-items: center;
       text-align: center;
       cursor: pointer;
-    }
-    .mint-icon-wrap {
-      box-shadow: 0 0 0 1px var(--faint), 0 0 40px rgba(107,173,232,0.9);
-      border-radius: 26px;
-      margin-bottom: 20px;
-      animation: glow 3s ease-in-out infinite;
-    }
-    .mint-icon-wrap img {
-      width: 100px;
-      height: 100px;
-      border-radius: 26px;
-      display: block;
-    }
-    @keyframes glow {
-      0%, 100% { box-shadow: 0 0 0 1px var(--faint), 0 0 40px rgba(107,173,232,0.9); }
-      50% { box-shadow: 0 0 0 1px var(--sky), 0 0 60px rgba(107,173,232,1); }
+      scroll-snap-align: start;
+      min-height: calc(100dvh - 125px);
+      justify-content: center;
     }
     .hero-title {
       font-family: 'DM Mono', monospace;
-      font-size: 10px;
-      letter-spacing: 3px;
+      font-size: 13px;
+      letter-spacing: 4px;
       color: var(--text);
-      margin-bottom: 4px;
+      margin-bottom: 8px;
     }
     .hero-script {
       font-family: 'Cormorant Garamond', serif;
       font-style: italic;
-      font-size: 2rem;
-      margin-bottom: 4px;
+      font-size: 4rem;
+      margin-bottom: 8px;
       color: var(--text);
+      line-height: 1;
     }
     .hero-script span { color: var(--sky); }
     .hero-sub {
-      font-size: 10px;
-      letter-spacing: 3px;
+      font-size: 13px;
+      letter-spacing: 4px;
       color: var(--text);
+      margin-bottom: 32px;
+    }
+    .mint-icon-wrap {
+      box-shadow: 0 0 0 1px var(--faint), 0 0 40px rgba(107,173,232,0.9);
+      border-radius: 26px;
+      animation: glow 3s ease-in-out infinite;
+    }
+    .mint-icon-wrap img {
+      width: 120px;
+      height: 120px;
+      border-radius: 26px;
+      display: block;
     }
 
     /* ─── STICKY MINT BAR ─── */
@@ -531,15 +530,17 @@
 
   <!-- FEED -->
   <div id="feed">
-    <div class="feed-loading" id="feed-loading">
-      <div class="spinner"></div>
-      <span>LOADING MOMENTS...</span>
+    <!-- MINT HERO scrolls with feed -->
+    <div id="mint-hero" onclick="goMint()">
+      <div class="hero-title">MINT AN</div>
+      <div class="hero-script">October-<span>San</span>™</div>
+      <div class="hero-sub">MOMENT.</div>
+      <div class="mint-icon-wrap">
+        <img src="/icon.png" alt="October-San" />
+      </div>
     </div>
+    <div id="feed-loading">...</div>
     <div id="feed-content"></div>
-    <div id="feed-empty" class="empty-state" style="display:none;">
-      <div>No moments yet.</div>
-      <div style="color:var(--muted);">Be the first to mint at the stadium.</div>
-    </div>
   </div>
 
   <!-- TAB BAR -->
