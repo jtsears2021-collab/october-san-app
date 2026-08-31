@@ -775,7 +775,30 @@
     const toAddress = document.getElementById('transfer-address').value.trim();
     const amount = document.getElementById('transfer-amount').value.trim();
     if (!toAddress || !amount) { showToast('Enter address and amount'); return; }
-    if (!connectedAccount) { showToast('Wallet not connected — please sign in again'); return; }
+    if (!connectedAccount) {
+      try {
+        showToast('CONNECTING WALLET...');
+        const wallet = inAppWallet();
+        // Try twice for mobile popup behavior
+        for (let i = 0; i < 2; i++) {
+          try {
+            connectedAccount = await wallet.connect({
+              client,
+              strategy: currentUser.provider === 'google' ? 'google' : 'apple',
+              chain: polygon,
+            });
+            break;
+          } catch(e) {
+            if (i === 1) throw e;
+            await new Promise(r => setTimeout(r, 500));
+          }
+        }
+      } catch(e) {
+        console.log('Reconnect error:', e.message);
+        showToast('TAP TRANSFER AGAIN');
+        return;
+      }
+    }
     
     const btn = document.getElementById('transfer-btn');
     btn.textContent = 'TRANSFERRING...';
