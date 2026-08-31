@@ -93,12 +93,12 @@
     #mint-bar {
       flex-shrink: 0;
       background: var(--black);
-      border-bottom: 1px solid var(--faint);
-      border-top: 1px solid var(--faint);
-      padding: 10px 16px;
+      border: 1px solid var(--faint);
+      box-shadow: 0 0 12px rgba(107,173,232,0.4);
+      padding: 12px 16px;
       display: flex;
       align-items: center;
-      gap: 10px;
+      justify-content: center;
       cursor: pointer;
       position: sticky;
       top: 0;
@@ -522,11 +522,13 @@
 
   <!-- STICKY MINT BAR -->
   <div id="mint-bar" onclick="goMint()">
-    <div class="mint-bar-icon">
-      <img src="/icon.png" alt="October-San" />
+    <div style="display:flex;align-items:center;justify-content:center;gap:12px;width:100%;">
+      <span style="font-family:'DM Mono',monospace;font-size:11px;letter-spacing:2px;color:var(--text);">TAP</span>
+      <div style="box-shadow:0 0 0 1px var(--faint),0 0 12px rgba(107,173,232,0.8);border-radius:10px;flex-shrink:0;">
+        <img src="/icon.png" alt="October-San" style="width:44px;height:44px;border-radius:10px;display:block;" />
+      </div>
+      <span style="font-family:'DM Mono',monospace;font-size:11px;letter-spacing:2px;color:var(--text);">TO MINT YOUR MOMENT</span>
     </div>
-    <div class="mint-bar-text">TAP TO MINT YOUR MOMENT</div>
-    <span class="mint-bar-username" id="header-username"></span>
   </div>
 
   <!-- FEED -->
