@@ -530,7 +530,7 @@
       <div class="snap-card" style="height:${snapH}px;">
         ${nft.image_url
           ? nft.isVideo
-            ? `<video data-src="${nft.image_url}" muted playsinline loop preload="none" style="width:100%;height:100%;object-fit:cover;"></video>`
+            ? `<div style="width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--muted);gap:1rem;"><span style="font-size:4rem;">🎬</span><span style="font-size:11px;letter-spacing:2px;">VIDEO MOMENT</span></div>`
             : `<img class="snap-card-media" src="${nft.image_url}" />`
           : `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:3rem;">◆</div>`
         }
@@ -557,25 +557,6 @@
       const idx = Math.round(feed.scrollTop / snapH);
       document.getElementById('snap-count').textContent = `${idx + 1} / ${snapNFTs.length}`;
     };
-
-    // Lazy load videos in snap scroll
-    const snapObserver = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        const video = entry.target;
-        if (entry.isIntersecting) {
-          if (!video.src && video.dataset.src) {
-            video.src = video.dataset.src;
-          }
-          video.play().catch(() => {});
-        } else {
-          video.pause();
-        }
-      });
-    }, { threshold: 0.5 });
-
-    feed.querySelectorAll('video').forEach(v => snapObserver.observe(v));
-  }
-      
   // Auto-play videos when visible
     const videoObserver = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
