@@ -556,21 +556,7 @@
       const idx = Math.round(feed.scrollTop / snapH);
       document.getElementById('snap-count').textContent = `${idx + 1} / ${snapNFTs.length}`;
     };
-    const snapObserver = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        const video = entry.target;
-        if (entry.isIntersecting) {
-          if (!video.src && video.dataset.src) {
-            video.src = video.dataset.src;
-          }
-          video.play().catch(() => {});
-        } else {
-          video.pause();
-        }
-      });
-    }, { threshold: 0.5 });
-
-    feed.querySelectorAll('video').forEach(v => snapObserver.observe(v));
+    
   // Auto-play videos when visible
     const videoObserver = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
