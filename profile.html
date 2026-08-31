@@ -587,7 +587,7 @@
 <div class="toast" id="toast"></div>
 
 <script type="module">
-  import { createThirdwebClient } from 'https://esm.sh/thirdweb@5.120.1';
+  import { createThirdwebClient, prepareTransaction, sendTransaction, toWei } from 'https://esm.sh/thirdweb@5.120.1';
   import { inAppWallet } from 'https://esm.sh/thirdweb@5.120.1/wallets';
   import { polygon } from 'https://esm.sh/thirdweb@5.120.1/chains';
   import { ethers } from 'https://esm.sh/ethers@5.7.2';
@@ -601,6 +601,7 @@
 
   const client = createThirdwebClient({ clientId: CLIENT_ID });
   let currentUser = null;
+  let connectedAccount = null;
   let walletAddress = '';
 
   const stored = localStorage.getItem('octsn_user');
@@ -613,6 +614,18 @@
     }
     document.getElementById('profile-content').style.display = 'block';
     walletAddress = currentUser.walletAddress || '';
+
+    // Reconnect embedded wallet for transactions
+    try {
+      const wallet = inAppWallet();
+      connectedAccount = await wallet.connect({
+        client,
+        strategy: currentUser.provider === 'google' ? 'google' : 'apple',
+        chain: polygon,
+      });
+    } catch(e) {
+      console.log('Wallet reconnect:', e.message);
+    }
 
     // Set profile info
     document.getElementById('profile-username').textContent = '@' + currentUser.username;
