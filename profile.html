@@ -805,9 +805,10 @@
     btn.disabled = true;
 
     try {
-      const tx = prepareTransaction({
+      const { prepareTransaction: prepTx } = await import('https://esm.sh/thirdweb@5.120.1');
+      const tx = prepTx({
         to: toAddress,
-        value: ethers.utils.parseEther(amount),
+        value: BigInt(ethers.utils.parseEther(amount).toString()),
         chain: polygon,
         client,
       });
