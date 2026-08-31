@@ -587,7 +587,7 @@
 <div class="toast" id="toast"></div>
 
 <script type="module">
-  import { createThirdwebClient, prepareTransaction, sendTransaction, toWei } from 'https://esm.sh/thirdweb@5.120.1';
+  import { createThirdwebClient, prepareTransaction, sendTransaction } from 'https://esm.sh/thirdweb@5.120.1';
   import { inAppWallet } from 'https://esm.sh/thirdweb@5.120.1/wallets';
   import { polygon } from 'https://esm.sh/thirdweb@5.120.1/chains';
   import { ethers } from 'https://esm.sh/ethers@5.7.2';
@@ -769,6 +769,34 @@
     closeSend();
   };
 
+  window.transfer = async function() {
+    const toAddress = document.getElementById('transfer-address').value.trim();
+    const amount = document.getElementById('transfer-amount').value.trim();
+    if (!toAddress || !amount) { showToast('Enter address and amount'); return; }
+    if (!connectedAccount) { showToast('Wallet not connected — please sign in again'); return; }
+    
+    const btn = document.getElementById('transfer-btn');
+    btn.textContent = 'TRANSFERRING...';
+    btn.disabled = true;
+
+    try {
+      const tx = prepareTransaction({
+        to: toAddress,
+        value: ethers.utils.parseEther(amount),
+        chain: polygon,
+        client,
+      });
+      await sendTransaction({ transaction: tx, account: connectedAccount });
+      showToast('✓ POL TRANSFERRED');
+      document.getElementById('transfer-sheet')?.remove();
+      loadBalance();
+    } catch(e) {
+      showToast('Transfer failed: ' + e.message.substring(0, 50));
+      btn.textContent = 'TRANSFER';
+      btn.disabled = false;
+    }
+  };
+  
   window.buyPOL = function() {
     // Transak works in California
     const url = `https://global.transak.com/?apiKey=e8c7c40d-a7b2-4e1f-8e25-a07f54f2c93d&defaultCryptoCurrency=MATIC&walletAddress=${walletAddress}&networks=polygon`;
