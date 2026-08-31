@@ -509,17 +509,6 @@
 <!-- MAIN APP -->
 <div id="app">
 
-  <!-- MINT HERO scrolls with feed -->
-  <div id="mint-hero" onclick="goMint()">
-    <div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:3px;color:var(--sky);margin-bottom:16px;">IN-GAME FAN-MINTED NFTs · ON POLYGON</div>
-    <div style="font-family:'Bebas Neue',sans-serif;font-size:3.2rem;letter-spacing:4px;color:var(--text);margin-bottom:4px;">MINT AN</div>
-    <div style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:3.2rem;color:#E8EDF5;line-height:1;margin-bottom:4px;">October-<span style="color:var(--sky);">San</span>™</div>
-    <div style="font-family:'Bebas Neue',sans-serif;font-size:3.2rem;letter-spacing:4px;color:var(--text);margin-bottom:32px;">MOMENT.</div>
-    <div class="mint-icon-wrap">
-      <img src="/icon.png" alt="October-San" />
-    </div>
-  </div>
-
   <!-- STICKY MINT BAR -->
   <div id="mint-bar" onclick="goMint()">
     <div style="display:flex;align-items:center;justify-content:center;gap:12px;width:100%;">
@@ -528,22 +517,32 @@
         <img src="/icon.png" alt="October-San" style="width:44px;height:44px;border-radius:10px;display:block;" />
       </div>
       <span style="font-family:'DM Mono',monospace;font-size:11px;letter-spacing:2px;color:var(--text);">TO MINT YOUR MOMENT</span>
+      <span class="mint-bar-username" id="header-username"></span>
     </div>
   </div>
 
   <!-- FEED -->
   <div id="feed">
-    <!-- MINT HERO scrolls with feed -->
+    <!-- MINT HERO inside feed so it scrolls away -->
     <div id="mint-hero" onclick="goMint()">
-      <div class="hero-title">MINT AN</div>
-      <div class="hero-script">October-<span>San</span>™</div>
-      <div class="hero-sub">MOMENT.</div>
+      <div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:3px;color:var(--sky);margin-bottom:16px;">IN-GAME FAN-MINTED NFTs · ON POLYGON</div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:3.2rem;letter-spacing:4px;color:var(--text);margin-bottom:4px;">MINT AN</div>
+      <div style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:3.2rem;color:#E8EDF5;line-height:1;margin-bottom:4px;">October-<span style="color:var(--sky);">San</span>™</div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:3.2rem;letter-spacing:4px;color:var(--text);margin-bottom:32px;">MOMENT.</div>
       <div class="mint-icon-wrap">
         <img src="/icon.png" alt="October-San" />
       </div>
     </div>
-    <div id="feed-loading">...</div>
+
+    <div class="feed-loading" id="feed-loading">
+      <div class="spinner"></div>
+      <span>LOADING MOMENTS...</span>
+    </div>
     <div id="feed-content"></div>
+    <div id="feed-empty" class="empty-state" style="display:none;">
+      <div>No moments yet.</div>
+      <div style="color:var(--muted);">Be the first to mint at the stadium.</div>
+    </div>
   </div>
 
   <!-- TAB BAR -->
@@ -565,7 +564,6 @@
       <span>PROFILE</span>
     </a>
   </div>
-
 </div>
 
 <script type="module">
