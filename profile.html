@@ -824,9 +824,7 @@
   };
   
   window.buyPOL = function() {
-    // Transak works in California
-    const url = `https://global.transak.com/?apiKey=e8c7c40d-a7b2-4e1f-8e25-a07f54f2c93d&defaultCryptoCurrency=MATIC&walletAddress=${walletAddress}&networks=polygon`;
-    window.open(url, '_blank');
+    window.open(`https://pay.coinbase.com/buy/select-asset?destinationWallets=[{"address":"${walletAddress}","assets":["MATIC"],"supportedNetworks":["polygon"]}]`, '_blank');
   };
 
   window.viewOnPolygonscan = function() {
