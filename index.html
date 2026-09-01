@@ -614,7 +614,6 @@
       currentUser = JSON.parse(stored);
       document.getElementById('header-username').textContent = '@' + currentUser.username;
       document.getElementById('signin-overlay').classList.add('hidden');
-      // Reconnect wallet silently
       try {
         const wallet = inAppWallet();
         const account = await wallet.connect({
@@ -627,6 +626,9 @@
       } catch(e) {
         console.log('Auto wallet connect:', e.message);
       }
+    }
+    if (!stored) {
+      document.getElementById('signin-overlay').style.display = 'flex';
     }
     loadFeed();
   }
