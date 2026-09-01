@@ -222,10 +222,6 @@
           <span class="price-preview-label">YOU RECEIVE (90%)</span>
           <span class="price-preview-value" id="receive-preview">—</span>
         </div>
-        
-        <label class="form-label" style="margin-top:1rem;">ADD A CAPTION (OPTIONAL)</label>
-        <textarea class="form-input" id="caption-input" placeholder="Describe your moment..." maxlength="280" rows="3" style="resize:none;"></textarea>
-        <div style="color:var(--muted);font-size:0.65rem;text-align:right;margin-top:-0.75rem;margin-bottom:0.5rem;" id="caption-count">0/280</div>
 
       <div id="auth-hint" style="color: var(--text); font-size: 0.65rem; letter-spacing: 0.15em; text-align: center; margin-bottom: 12px;">
         TAP SIGN-IN TWICE TO AUTHENTICATE YOUR OCTOBER-SAN WALLET
@@ -439,32 +435,12 @@
       });
       const result = await sendTransaction({ transaction: listTx, account: connectedAccount });
       const txHash = result.transactionHash || result.hash || '';
-      const caption = document.getElementById('caption-input').value.trim();
       
             // Show success first
       document.getElementById('nft-content').style.display = 'none';
       document.getElementById('success-screen').classList.add('visible');
       document.querySelector('.scroll-hint').style.display = 'none';
       document.getElementById('tx-link').href = txHash ? 'https://polygonscan.com/tx/' + txHash : 'https://polygonscan.com';
-
-      // Then save caption (non-blocking, fire and forget)
-      if (caption) {
-        fetch(
-          `https://firestore.googleapis.com/v1/projects/october-san-e3a33/databases/(default)/documents/listings/${tokenId}`,
-          {
-            method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              fields: {
-                caption: { stringValue: caption },
-                tokenId: { stringValue: tokenId },
-                listedAt: { stringValue: new Date().toISOString() },
-                seller: { stringValue: connectedAccount.address }
-              }
-            })
-          }
-        ).catch(e => console.log('Caption save error:', e.message));
-      }
 
     } catch(e) {
       console.error('List error:', e.message, e.stack);
@@ -484,10 +460,6 @@
     el.textContent = msg;
     el.className = 'status-msg ' + type;
   }
-
-  document.getElementById('caption-input')?.addEventListener('input', function() {
-    document.getElementById('caption-count').textContent = this.value.length + '/280';
-  });
   
   loadNFT();
   document.getElementById('price-input')?.addEventListener('input', updatePricePreview);
