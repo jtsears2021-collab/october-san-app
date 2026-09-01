@@ -654,7 +654,8 @@
       const ownerShort = nft.owner_addresses?.[0]
         ? nft.owner_addresses[0].substring(0,6) + '...' + nft.owner_addresses[0].slice(-4)
         : '—';
-      const isOwner = currentUser?.walletAddress?.toLowerCase() === (nft.seller?.toLowerCase() || '');
+      const ownerAddr = nft.owner_addresses?.[0] || '';
+      const isOwner = currentUser?.walletAddress?.toLowerCase() === ownerAddr?.toLowerCase();
       return `
         <div class="snap-card" style="height:${snapH}px;">
           ${nft.image_url
