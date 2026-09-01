@@ -596,11 +596,26 @@
   }
 
   // ─── GEOFENCE ─────────────────────────────────────────────
-  window.checkLocation = function() {
+  window.checkLocation = async function() {
     if (DEV_MODE) {
       startCamera();
       return;
     }
+
+    // Check if collection is open
+    try {
+      const res = await fetch('https://firestore.googleapis.com/v1/projects/october-san-e3a33/databases/(default)/documents/collections/current?key=AIzaSyBX6hKfUBi8oXx9ew22-jLpL4SxQJKoRIg');
+      const data = await res.json();
+      const isOpen = data.fields?.isOpen?.booleanValue;
+      if (!isOpen) {
+        document.querySelector('.geo-text').innerHTML = 
+          'No collection is currently open.<br><br>October-San moments can only be minted<br>during live game events.';
+        return;
+      }
+    } catch(e) {
+      console.log('Collection check error:', e.message);
+    }
+
     navigator.geolocation.getCurrentPosition(
       pos => {
         const dist = getDistance(pos.coords.latitude, pos.coords.longitude, STADIUM_LAT, STADIUM_LNG);
