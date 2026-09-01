@@ -783,7 +783,7 @@
       
         ownerUsername = userCache[ownerAddress] || ownerAddress.substring(0,6) + '...' + ownerAddress.slice(-4);
         
-        const isOwner = currentUser?.walletAddress?.toLowerCase() === ownerAddress?.toLowerCase();
+        const isOwner = currentUser?.walletAddress?.toLowerCase() === seller?.toLowerCase();
         return { tokenId, imageUrl, isVideo, isListed, priceInPOL, priceInUSD, listingId, seller, ownerAddress, ownerUsername, isOwner, name: nft.name };
       }));
 
