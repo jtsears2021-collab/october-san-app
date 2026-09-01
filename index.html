@@ -834,7 +834,7 @@
   // ─── ACTIONS ──────────────────────────────────────────────
   window.goMint = function() {
     if (!currentUser) {
-      document.getElementById('signin-overlay').classList.remove('hidden');
+      document.getElementById('signin-overlay').style.display = 'flex';
       return;
     }
     window.location.href = '/mint';
