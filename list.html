@@ -439,7 +439,8 @@
             // Show success first
       document.getElementById('nft-content').style.display = 'none';
       document.getElementById('success-screen').classList.add('visible');
-      document.querySelector('.scroll-hint').style.display = 'none';
+      const scrollHint = document.querySelector('.scroll-hint');
+      if (scrollHint) scrollHint.style.display = 'none';
       document.getElementById('tx-link').href = txHash ? 'https://polygonscan.com/tx/' + txHash : 'https://polygonscan.com';
 
     } catch(e) {
