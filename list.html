@@ -212,15 +212,11 @@
 
     <div id="list-section">
       <div class="form-card">
-        <label class="form-label">LIST PRICE (USD)</label>
-        <input type="number" inputmode="decimal" class="form-input" id="price-input" placeholder="ENTER USD PRICE" min="0.01" step="0.01" />
-        <div class="price-preview">
-          <span class="price-preview-label">APPROX. POL</span>
-          <span class="price-preview-value" id="pol-preview">— POL</span>
-        </div>
+        <label class="form-label">LIST PRICE (POL)</label>
+        <input type="number" inputmode="decimal" class="form-input" id="price-input" placeholder="ENTER POL PRICE" min="0.01" step="0.01" />
         <div class="price-preview">
           <span class="price-preview-label">YOU RECEIVE (90%)</span>
-          <span class="price-preview-value" id="receive-preview">—</span>
+          <span class="price-preview-value" id="receive-preview">— POL</span>
         </div>
       </div>
 
@@ -350,14 +346,11 @@
   }
 
   async function updatePricePreview() {
-    const polPrice = await getLivePOLPrice();
-    const usd = parseFloat(document.getElementById('price-input').value) || 0;
-    const pol = usd / polPrice;
-    const receive = usd * 0.925;
-    document.getElementById('pol-preview').textContent = pol > 0 ? pol.toFixed(4) + ' POL' : '— POL';
-    document.getElementById('receive-preview').textContent = receive > 0 ? '$' + receive.toFixed(2) + ' USD' : '—';
+    const pol = parseFloat(document.getElementById('price-input').value) || 0;
+    const receive = pol * 0.925;
+    document.getElementById('receive-preview').textContent = receive > 0 ? receive.toFixed(4) + ' POL' : '— POL';
   }
-
+  
   window.connectWallet = async function(strategy) {
     const appleBtn = document.getElementById('connect-apple-btn');
     const googleBtn = document.getElementById('connect-google-btn');
@@ -420,8 +413,7 @@
     btn.disabled = true;
     showStatus('Approving marketplace...', 'info');
     try {
-      const polPrice = await getLivePOLPrice();
-      const priceInPOL = (usdPrice / polPrice).toFixed(6);
+      const priceInPOL = polPrice.toFixed(6);
       const priceInWei = ethers.utils.parseEther(priceInPOL).toString();
       const now = Math.floor(Date.now() / 1000);
       const endTime = now + (30 * 24 * 60 * 60);
