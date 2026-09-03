@@ -413,7 +413,7 @@
     btn.disabled = true;
     showStatus('Approving marketplace...', 'info');
     try {
-      const priceInPOL = polPrice.toFixed(6);
+      const priceInPOL = usdPrice.toFixed(6);
       const priceInWei = ethers.utils.parseEther(priceInPOL).toString();
       const now = Math.floor(Date.now() / 1000);
       const endTime = now + (30 * 24 * 60 * 60);
