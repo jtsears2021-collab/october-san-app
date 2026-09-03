@@ -292,7 +292,15 @@
   const CLIENT_ID = 'fb1460b2756706cc08a4f650e68fd526';
   const CONTRACT_ADDRESS = '0xeaB90D7c57FC9335E88B89e6a96170a24725d37E';
   const MARKETPLACE_ADDRESS = '0x353aFb513F80F2D5b56D598EEA203D52D0D635f6';
-  const POL_PRICE_USD = 0.07;
+  async function getLivePOLPrice() {
+    try {
+      const res = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=matic-network&vs_currencies=usd');
+      const data = await res.json();
+      return data['matic-network']?.usd || 0.07;
+    } catch(e) {
+      return 0.07;
+    }
+  }
 
   const client = createThirdwebClient({ clientId: CLIENT_ID });
 
@@ -341,10 +349,11 @@
     } catch(e) { showNotFound(); }
   }
 
-  function updatePricePreview() {
+  async function updatePricePreview() {
+    const polPrice = await getLivePOLPrice();
     const usd = parseFloat(document.getElementById('price-input').value) || 0;
-    const pol = usd / POL_PRICE_USD;
-    const receive = usd * 0.9;
+    const pol = usd / polPrice;
+    const receive = usd * 0.925;
     document.getElementById('pol-preview').textContent = pol > 0 ? pol.toFixed(4) + ' POL' : '— POL';
     document.getElementById('receive-preview').textContent = receive > 0 ? '$' + receive.toFixed(2) + ' USD' : '—';
   }
@@ -411,7 +420,8 @@
     btn.disabled = true;
     showStatus('Approving marketplace...', 'info');
     try {
-      const priceInPOL = (usdPrice / POL_PRICE_USD).toFixed(6);
+      const polPrice = await getLivePOLPrice();
+      const priceInPOL = (usdPrice / polPrice).toFixed(6);
       const priceInWei = ethers.utils.parseEther(priceInPOL).toString();
       const now = Math.floor(Date.now() / 1000);
       const endTime = now + (30 * 24 * 60 * 60);
