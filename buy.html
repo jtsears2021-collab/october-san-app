@@ -427,8 +427,7 @@
 
       listingId = listing.listingId.toString();
       const priceInPOL = ethers.utils.formatEther(listing.pricePerToken);
-      const polPrice = await getLivePOLPrice();
-      const priceInUSD = (parseFloat(priceInPOL) * polPrice).toFixed(2);
+      const priceInUSD = parseFloat(priceInPOL).toFixed(4) + ' POL';
 
       listingData = {
         listingId,
