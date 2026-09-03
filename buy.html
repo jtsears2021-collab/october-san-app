@@ -250,10 +250,6 @@
       </div>
       <div class="divider"></div>
       <div class="price-row">
-        <span class="price-label">APPROX. USD</span>
-        <span class="price-value" id="price-usd">—</span>
-      </div>
-      <div class="price-row">
         <span class="price-label">SELLER</span>
         <span class="price-value" id="seller-addr">—</span>
       </div>
@@ -446,7 +442,6 @@
       document.getElementById('nft-title').textContent = nft?.name || `October-San Moment #${tokenId}`;
       document.getElementById('nft-meta').textContent = `TOKEN #${tokenId} · OCTOBER-SAN · POLYGON`;
       document.getElementById('price-pol').textContent = `${parseFloat(priceInPOL).toFixed(4)} POL`;
-      document.getElementById('price-usd').textContent = `~$${priceInUSD} USD`;
       document.getElementById('seller-addr').textContent = `${listing.listingCreator.substring(0,6)}...${listing.listingCreator.slice(-4)}`;
 
       if (nft?.image_url) {
