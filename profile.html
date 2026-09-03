@@ -655,7 +655,8 @@
       const provider = new ethers.providers.JsonRpcProvider(`https://137.rpc.thirdweb.com/${CLIENT_ID}`);
       const balance = await provider.getBalance(walletAddress);
       const polBalance = parseFloat(ethers.utils.formatEther(balance));
-      const usdBalance = (polBalance * POL_PRICE_USD).toFixed(2);
+      const polPrice = await getLivePOLPrice();
+      const usdBalance = (polBalance * polPrice).toFixed(2);
       document.getElementById('wallet-balance').textContent = polBalance.toFixed(4) + ' POL';
       document.getElementById('wallet-balance-usd').textContent = '≈ $' + usdBalance + ' USD';
     } catch(e) { console.log('Balance error:', e.message); }
