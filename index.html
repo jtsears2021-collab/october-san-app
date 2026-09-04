@@ -769,7 +769,6 @@
         const listing = activeListings.find(l => l.tokenId.toString() === tokenId);
         const isListed = !!listing;
         const priceInPOL = isListed ? ethers.utils.formatEther(listing.pricePerToken) : null;
-        const priceInUSD = priceInPOL ? (parseFloat(priceInPOL) * 0.07).toFixed(2) : null;
         const listingId = isListed ? listing.listingId.toString() : null;
         const seller = isListed ? listing.listingCreator : null;
 
@@ -783,7 +782,7 @@
         ownerUsername = userCache[ownerAddress] || ownerAddress.substring(0,6) + '...' + ownerAddress.slice(-4);
         
         const isOwner = currentUser?.walletAddress?.toLowerCase() === seller?.toLowerCase();
-        return { tokenId, imageUrl, isVideo, isListed, priceInPOL, priceInUSD, listingId, seller, ownerAddress, ownerUsername, isOwner, name: nft.name };
+        return { tokenId, imageUrl, isVideo, isListed, priceInPOL, listingId, seller, ownerAddress, ownerUsername, isOwner, name: nft.name };
       }));
 
       renderFeed(cards);
@@ -814,7 +813,7 @@
           </div>
           <div class="nft-card-actions">
             ${card.isListed && card.isOwner
-              ? `<a style="background:var(--sky);color:var(--black);border:none;border-radius:4px;font-family:'DM Mono',monospace;font-size:11px;font-weight:700;letter-spacing:1.5px;padding:10px 20px;flex:1;text-decoration:none;text-align:center;" href="/buy/${card.tokenId}">LISTED · $${card.priceInUSD}</a>`
+              ?`<a style="background:var(--sky);color:var(--black);border:none;border-radius:4px;font-family:'DM Mono',monospace;font-size:11px;font-weight:700;letter-spacing:1.5px;padding:10px 20px;flex:1;text-decoration:none;text-align:center;" href="/buy/${card.tokenId}">LISTED · ${parseFloat(card.priceInPOL).toFixed(2)} POL</a>`
               : ''
             }
             ${card.isListed && !card.isOwner
