@@ -455,7 +455,8 @@
       document.getElementById('tx-link').href = txHash ? 'https://polygonscan.com/tx/' + txHash : 'https://polygonscan.com';
 
     } catch(e) {
-      console.error('List error:', e.message, e.stack);
+      console.error('List error:', e);
+      alert('Error: ' + e.message);
       showStatus('Listing failed: ' + e.message, 'error');
       btn.textContent = 'LIST ON OCTOBER-SAN';
       btn.disabled = false;
