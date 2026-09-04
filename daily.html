@@ -501,7 +501,6 @@
             listed: true,
             listing_id: listing.listingId.toString(),
             price_pol: priceInPOL,
-            price_usd: (parseFloat(priceInPOL) * 0.07).toFixed(2),
             seller: listing.listingCreator,
           };
         }
@@ -674,7 +673,7 @@
               </div>
             </div>
             <div class="snap-actions">
-              ${nft.listed && !isOwner ? `<button class="btn-buy" onclick="window.location.href='/buy/${nft.token_id}'">BUY · $${nft.price_usd}</button>` : ''}
+              ${nft.listed && !isOwner ? `<button class="btn-buy" onclick="window.location.href='/buy/${nft.token_id}'">BUY · ${parseFloat(nft.price_pol).toFixed(2)} POL</button>` : ''}
               ${nft.listed && isOwner ? `<a class="btn-action" href="/buy/${nft.token_id}">MANAGE LISTING</a>` : ''}
               ${!nft.listed && isOwner ? `<a class="btn-action" href="/list/${nft.token_id}">LIST FOR SALE</a>` : ''}
             </div>
