@@ -573,6 +573,7 @@
       document.getElementById('tx-link').href = `https://polygonscan.com/tx/${txHash}`;
       document.getElementById('tx-link').style.display = txHash ? 'block' : 'none';
       document.getElementById('scroll-hint').style.display = 'none';
+      document.getElementById('buy-section').style.display = 'none';
       // Redirect back to app after 4 seconds
       setTimeout(() => {
         window.location.href = 'com.octobersanapp://';
