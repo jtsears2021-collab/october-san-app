@@ -418,13 +418,22 @@
       const now = Math.floor(Date.now() / 1000);
       const endTime = now + (30 * 24 * 60 * 60);
 
-      const nftContract = getContract({ client, chain: polygon, address: CONTRACT_ADDRESS });
-      const approveTx = prepareContractCall({
-        contract: nftContract,
-        method: 'function setApprovalForAll(address operator, bool approved)',
-        params: [MARKETPLACE_ADDRESS, true],
-      });
-      await sendTransaction({ transaction: approveTx, account: connectedAccount });
+      // Check if already approved — skip if so
+      const nftAbi = ['function isApprovedForAll(address account, address operator) view returns (bool)'];
+      const provider = new ethers.providers.JsonRpcProvider(`https://137.rpc.thirdweb.com/${CLIENT_ID}`);
+      const nftCheck = new ethers.Contract(CONTRACT_ADDRESS, nftAbi, provider);
+      const isApproved = await nftCheck.isApprovedForAll(connectedAccount.address, MARKETPLACE_ADDRESS);
+      
+      if (!isApproved) {
+        showStatus('Approving marketplace...', 'info');
+        const nftContract = getContract({ client, chain: polygon, address: CONTRACT_ADDRESS });
+        const approveTx = prepareContractCall({
+          contract: nftContract,
+          method: 'function setApprovalForAll(address operator, bool approved)',
+          params: [MARKETPLACE_ADDRESS, true],
+        });
+        await sendTransaction({ transaction: approveTx, account: connectedAccount });
+      }
       
       btn.textContent = 'STEP 2 OF 2...';
       showStatus('Creating listing...', 'info');
