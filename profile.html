@@ -597,8 +597,16 @@
   const MARKETPLACE_ADDRESS = '0x353aFb513F80F2D5b56D598EEA203D52D0D635f6';
   const FIREBASE_URL = 'https://firestore.googleapis.com/v1/projects/october-san-e3a33/databases/(default)/documents';
   const FIREBASE_API_KEY = 'AIzaSyBX6hKfUBi8oXx9ew22-jLpL4SxQJKoRIg';
-  const POL_PRICE_USD = 0.07;
 
+  async function getLivePOLPrice() {
+    try {
+      const res = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=polygon-ecosystem-token&vs_currencies=usd');
+      const data = await res.json();
+      return data['polygon-ecosystem-token']?.usd || 0.09;
+    } catch(e) {
+      return 0.09;
+    }
+  }
   const client = createThirdwebClient({ clientId: CLIENT_ID });
   let currentUser = null;
   let connectedAccount = null;
