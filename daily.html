@@ -674,7 +674,7 @@
             </div>
             <div class="snap-actions">
               ${nft.listed && !isOwner ? `<button class="btn-buy" onclick="window.location.href='/buy/${nft.token_id}'">BUY · ${parseFloat(nft.price_pol).toFixed(2)} POL</button>` : ''}
-              ${nft.listed && isOwner ? `<a class="btn-action" href="/buy/${nft.token_id}">MANAGE LISTING</a>` : ''}
+              ${nft.listed && isOwner ? `<a style="background:var(--sky);color:var(--black);border:none;border-radius:4px;font-family:'DM Mono',monospace;font-size:11px;font-weight:700;letter-spacing:1.5px;padding:10px 20px;flex:1;text-decoration:none;text-align:center;" href="/buy/${nft.token_id}">LISTED · ${parseFloat(nft.price_pol).toFixed(2)} POL</a>` : ''}
               ${!nft.listed && isOwner ? `<a class="btn-action" href="/list/${nft.token_id}">LIST FOR SALE</a>` : ''}
             </div>
           </div>
