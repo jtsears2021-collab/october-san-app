@@ -529,7 +529,7 @@
       <div class="snap-card" style="height:${snapH}px;">
         ${nft.image_url
           ? nft.isVideo
-            ? `<div style="width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--muted);gap:1rem;"><span style="font-size:4rem;">🎬</span><span style="font-size:11px;letter-spacing:2px;">VIDEO MOMENT</span></div>`
+            ? `<video data-src="${nft.image_url}" muted playsinline loop preload="none" style="width:100%;height:100%;object-fit:cover;"></video>`
             : `<img class="snap-card-media" src="${nft.image_url}" />`
           : `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:3rem;">◆</div>`
         }
@@ -555,21 +555,23 @@
     feed.onscroll = () => {
       const idx = Math.round(feed.scrollTop / snapH);
       document.getElementById('snap-count').textContent = `${idx + 1} / ${snapNFTs.length}`;
+      playCurrentVideo();
     };
-  // Auto-play videos when visible
-    const videoObserver = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        const video = entry.target;
-        if (entry.isIntersecting) {
-          video.play().catch(() => {});
+
+    function playCurrentVideo() {
+      const idx = Math.round(feed.scrollTop / snapH);
+      feed.querySelectorAll('video').forEach((v, i) => {
+        if (i === idx) {
+          if (!v.src && v.dataset.src) v.src = v.dataset.src;
+          v.play().catch(() => {});
         } else {
-          video.pause();
-          video.src = video.src;
+          v.pause();
+          v.src = '';
         }
       });
-    }, { threshold: 0.5 });
+    }
 
-    feed.querySelectorAll('video').forEach(v => videoObserver.observe(v));
+    playCurrentVideo();
   }
 
   // ─── SIGN IN ──────────────────────────────────────────────
