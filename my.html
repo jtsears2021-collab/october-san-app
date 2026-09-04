@@ -539,7 +539,7 @@
           <div class="snap-actions">
             ${nft.listed
               ? `<a class="btn-cancel" href="/buy/${nft.token_id}">CANCEL LISTING</a>
-                 <div style="font-size:10px;color:var(--green);letter-spacing:1px;">$${nft.price_usd} · ${parseFloat(nft.price_pol).toFixed(2)} POL</div>`
+                 <div style="font-size:10px;color:var(--green);letter-spacing:1px;">${parseFloat(nft.price_pol).toFixed(2)} POL</div>`
               : `<a class="btn-action" href="/list/${nft.token_id}">LIST FOR SALE</a>`
             }
           </div>
