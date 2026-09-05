@@ -529,7 +529,7 @@
       <div class="snap-card" style="height:${snapH}px;">
         ${nft.image_url
           ? nft.isVideo
-            ? `<video data-src="${nft.image_url}" muted playsinline loop preload="none" style="width:100%;height:100%;object-fit:cover;"></video>`
+            ? `<video src="${nft.image_url}" muted playsinline loop preload="metadata" style="width:100%;height:100%;object-fit:cover;"></video>`
             : `<img class="snap-card-media" src="${nft.image_url}" />`
           : `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:3rem;">◆</div>`
         }
@@ -562,7 +562,6 @@
       const idx = Math.round(feed.scrollTop / snapH);
       feed.querySelectorAll('video').forEach((v, i) => {
         if (i === idx) {
-          if (!v.src && v.dataset.src) v.src = v.dataset.src;
           v.play().catch(() => {});
         } else {
           v.pause();
