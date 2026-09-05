@@ -562,8 +562,12 @@
       const idx = Math.round(feed.scrollTop / snapH);
       feed.querySelectorAll('video').forEach((v, i) => {
         if (i === idx) {
-          if (!v.src && v.dataset.src) v.src = v.dataset.src;
-          setTimeout(() => v.play().catch(() => {}), 100);
+          if (!v.src && v.dataset.src) {
+            v.src = v.dataset.src;
+            v.addEventListener('loadeddata', () => v.play().catch(() => {}), { once: true });
+          } else {
+            v.play().catch(() => {});
+          }
         } else {
           v.pause();
         }
