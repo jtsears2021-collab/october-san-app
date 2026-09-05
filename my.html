@@ -563,7 +563,7 @@
       feed.querySelectorAll('video').forEach((v, i) => {
         if (i === idx) {
           if (!v.src && v.dataset.src) v.src = v.dataset.src;
-          v.play().catch(() => {});
+          setTimeout(() => v.play().catch(() => {}), 100);
         } else {
           v.pause();
         }
