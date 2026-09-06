@@ -35,6 +35,7 @@
       height: 100vh;
       height: 100dvh;
       overflow: hidden;
+      padding-top: env(safe-area-inset-top);
     }
     #header {
       flex-shrink: 0;
@@ -269,7 +270,6 @@
     #tab-bar {
       flex-shrink: 0; display: flex; background: var(--black);
       border-top: 1px solid var(--faint);
-      padding-bottom: env(safe-area-inset-bottom);
     }
     .tab {
       flex: 1; display: flex; flex-direction: column; align-items: center;
