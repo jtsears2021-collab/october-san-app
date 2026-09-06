@@ -711,13 +711,27 @@
     window.location.href = '/';
   };
 
-  window.saveToRoll = function() {
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(capturedBlob);
-    a.download = capturedType === 'video' ? 'october-san-moment.mp4' : 'october-san-moment.jpg';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
+  window.saveToRoll = async function() {
+    try {
+      const file = new File([capturedBlob], 
+        capturedType === 'video' ? 'october-san-moment.mp4' : 'october-san-moment.jpg',
+        { type: capturedBlob.type }
+      );
+      if (navigator.share && navigator.canShare({ files: [file] })) {
+        await navigator.share({
+          files: [file],
+          title: 'October-San Moment',
+        });
+      } else {
+        // Fallback to download
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(capturedBlob);
+        a.download = capturedType === 'video' ? 'october-san-moment.mp4' : 'october-san-moment.jpg';
+        a.click();
+      }
+    } catch(e) {
+      console.log('Share error:', e.message);
+    }
   };
 
   document.addEventListener('DOMContentLoaded', init);
