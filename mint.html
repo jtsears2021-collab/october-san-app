@@ -557,13 +557,6 @@
     const file = e.target.files[0];
     if (!file) return;
 
-    // Check if captured within last 2 minutes
-    const age = Date.now() - file.lastModified;
-    if (age > 120000) {
-      alert('Please capture a new moment — only live photos and videos can be minted.');
-      return;
-    }
-
     // Check video duration
     if (capturedType === 'video') {
       const duration = await getVideoDuration(file);
