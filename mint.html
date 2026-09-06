@@ -569,6 +569,9 @@
   document.getElementById('native-camera-input').addEventListener('change', async function(e) {
     const file = e.target.files[0];
     if (!file) return;
+    
+    capturedType = file.type.startsWith('video') ? 'video' : 'photo';
+    capturedBlob = file;
 
     // Check video duration
     if (capturedType === 'video') {
@@ -579,11 +582,9 @@
       }
     }
 
-    capturedBlob = file;
-    capturedType = file.type.startsWith('video') ? 'video' : 'photo';
     await showPreview();
   });
-
+  
   // ─── PREVIEW ──────────────────────────────────────────────
   async function showPreview() {
     showScreen('preview-screen');
