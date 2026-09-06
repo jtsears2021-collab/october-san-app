@@ -262,7 +262,12 @@
     }
     .user-name { font-size: 12px; font-weight: 700; color: var(--text); letter-spacing: 1px; }
     .nft-name-label { font-size: 10px; color: var(--muted); }
-    .snap-actions { display: flex; gap: 10px; align-items: center; }
+    .snap-actions { 
+      display: flex; 
+      gap: 10px; 
+      align-items: center;
+      padding-bottom: env(safe-area-inset-bottom);
+    }
     .btn-buy {
       background: var(--green);
       color: var(--black);
