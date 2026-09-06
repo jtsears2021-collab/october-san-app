@@ -380,6 +380,7 @@
         <div class="preview-title" id="preview-title">October-San Moment</div>
         <div class="preview-meta" id="preview-meta">POLYGON BLOCKCHAIN · TODAY</div>
       </div>
+      <button onclick="saveToRoll()" style="background:none;border:none;color:rgba(255,255,255,0.5);font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1px;cursor:pointer;margin-bottom:8px;">↓ SAVE TO CAMERA ROLL</button>
       <button class="mint-btn" onclick="mintMoment()" id="mint-btn">MINT THIS MOMENT</button>
     </div>
   </div>
@@ -583,11 +584,9 @@
 
   // ─── PREVIEW ──────────────────────────────────────────────
   async function showPreview() {
-    if (stream) stream.getTracks().forEach(t => t.stop());
     showScreen('preview-screen');
     const url = URL.createObjectURL(capturedBlob);
     const today = new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
-
     if (capturedType === 'photo') {
       document.getElementById('preview-media').src = url;
       document.getElementById('preview-media').style.display = 'block';
@@ -710,6 +709,15 @@
   window.goBack = function() {
     if (stream) stream.getTracks().forEach(t => t.stop());
     window.location.href = '/';
+  };
+
+  window.saveToRoll = function() {
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(capturedBlob);
+    a.download = capturedType === 'video' ? 'october-san-moment.mp4' : 'october-san-moment.jpg';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
   };
 
   document.addEventListener('DOMContentLoaded', init);
