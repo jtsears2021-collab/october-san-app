@@ -372,9 +372,11 @@
   <video id="preview-video" autoplay muted loop playsinline></video>
   <div class="preview-overlay">
     <div class="preview-top">
-      <button class="preview-retake" onclick="retake()">← RETAKE</button>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <button class="preview-retake" onclick="retake()">← RETAKE</button>
+        <button class="preview-retake" onclick="saveToRoll()">↓ SAVE TO PHOTOS</button>
+      </div>
       <div style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:1rem;color:white;">October-<span style="color:var(--sky);">San</span>™</div>
-      <button onclick="saveToRoll()" class="preview-retake">↓ SAVE</button>
     </div>
     <div class="preview-bottom">
       <div class="preview-info">
