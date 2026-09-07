@@ -702,14 +702,12 @@
       }
       document.getElementById('stat-listed').textContent = listed;
        // True mint count from contract events
-      const mintRes = await fetch(
-        `https://137.insight.thirdweb.com/v1/tokens/transfers?contract_address=${CONTRACT_ADDRESS}&to_address=${walletAddress}&chain=137&limit=100`,
-        { headers: { 'x-client-id': CLIENT_ID } }
+      const mintsRes = await fetch(
+        `https://firestore.googleapis.com/v1/projects/october-san-e3a33/databases/(default)/documents/mints?key=${FIREBASE_API_KEY}`
       );
-      const mintData = await mintRes.json();
-      console.log('Mint data:', JSON.stringify(mintData).substring(0, 300));
-      const minted = (mintData.data || []).filter(e => 
-        e.from_address === '0x0000000000000000000000000000000000000000'
+      const mintsData = await mintsRes.json();
+      const minted = (mintsData.documents || []).filter(d =>
+        d.fields?.wallet?.stringValue === walletAddress.toLowerCase()
       ).length;
       document.getElementById('stat-minted').textContent = minted;
     } catch(e) { console.log('Stats error:', e.message); }
