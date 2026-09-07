@@ -512,8 +512,9 @@
   </div>
   <div style="color:var(--text);font-size:11px;letter-spacing:1px;margin-bottom:16px;">This is not your Apple/Google ID — just your October-San username.</div>
   <button class="btn-continue" onclick="completeOnboarding()">LET'S GO</button>
+    <button onclick="cancelOnboarding()" style="background:none;border:none;color:var(--muted);font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1px;cursor:pointer;margin-top:8px;">CANCEL</button>
 </div>
-
+  
 <!-- MAIN APP -->
 <div id="app">
 
@@ -668,15 +669,16 @@
         }
       } catch(e) {}
 
+      // Hide sign in overlay first
+      document.getElementById('signin-overlay').style.display = 'none';
+
       // Show wallet creation screen briefly
-      document.getElementById('wallet-screen').classList.remove('hidden');
       document.getElementById('wallet-screen').style.display = 'flex';
       await new Promise(r => setTimeout(r, 2500));
       document.getElementById('wallet-screen').style.display = 'none';
-      
+
       // New user — show onboarding
       currentUser = { userId: account.address, provider: strategy, walletAddress: account.address };
-      document.getElementById('signin-overlay').style.display = 'none';
       document.getElementById('onboarding-overlay').classList.remove('hidden');
 
     } catch(e) {
@@ -699,6 +701,12 @@
       alert('Only letters, numbers and underscores allowed.');
       return;
     }
+
+  window.cancelOnboarding = function() {
+    document.getElementById('onboarding-overlay').classList.add('hidden');
+    localStorage.removeItem('octsn_user');
+    window.location.href = '/';
+  };
 
     // Check availability
     try {
