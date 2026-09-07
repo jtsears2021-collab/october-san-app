@@ -490,6 +490,15 @@
   <button class="signin-skip" onclick="browseWithoutSignIn()">BROWSE WITHOUT SIGNING IN →</button>
 </div>
 
+<!-- WALLET CREATION SCREEN -->
+<div id="wallet-screen" class="hidden" style="position:fixed;inset:0;background:var(--black);z-index:999;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2rem;text-align:center;">
+  <div style="box-shadow:0 0 0 1px var(--faint),0 0 40px rgba(107,173,232,0.9);border-radius:26px;animation:glow 3s ease-in-out infinite;margin-bottom:2rem;">
+    <img src="/icon.png" style="width:100px;height:100px;border-radius:26px;display:block;" />
+  </div>
+  <div style="font-family:'DM Mono',monospace;font-size:11px;letter-spacing:3px;color:var(--sky);margin-bottom:1rem;">CREATING YOUR WALLET</div>
+  <div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1px;color:var(--muted);line-height:1.8;max-width:280px;">October-San is creating your embedded NFT wallet address on the Polygon blockchain.</div>
+</div>
+
 <!-- ONBOARDING OVERLAY -->
 <div id="onboarding-overlay" class="hidden">
   <div class="signin-icon-wrap">
@@ -659,6 +668,12 @@
         }
       } catch(e) {}
 
+      // Show wallet creation screen briefly
+      document.getElementById('wallet-screen').classList.remove('hidden');
+      document.getElementById('wallet-screen').style.display = 'flex';
+      await new Promise(r => setTimeout(r, 2500));
+      document.getElementById('wallet-screen').style.display = 'none';
+      
       // New user — show onboarding
       currentUser = { userId: account.address, provider: strategy, walletAddress: account.address };
       document.getElementById('signin-overlay').style.display = 'none';
