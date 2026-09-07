@@ -701,8 +701,17 @@
         ).length;
       }
       document.getElementById('stat-listed').textContent = listed;
-      document.getElementById('stat-minted').textContent = owned + listed; // approximation
-
+       // True mint count from contract events
+      const mintRes = await fetch(
+        `https://137.insight.thirdweb.com/v1/events/${CONTRACT_ADDRESS}?event_name=TransferSingle&chain=137&limit=100`,
+        { headers: { 'x-client-id': CLIENT_ID } }
+      );
+      const mintData = await mintRes.json();
+      const minted = (mintData.data || []).filter(e => 
+        e.data?.to?.toLowerCase() === walletAddress.toLowerCase() &&
+        e.data?.from === '0x0000000000000000000000000000000000000000'
+      ).length;
+      document.getElementById('stat-minted').textContent = minted;
     } catch(e) { console.log('Stats error:', e.message); }
   }
 
