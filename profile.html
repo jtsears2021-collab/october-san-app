@@ -707,6 +707,7 @@
         { headers: { 'x-client-id': CLIENT_ID } }
       );
       const mintData = await mintRes.json();
+      console.log('Mint data:', JSON.stringify(mintData).substring(0, 300));
       const minted = (mintData.data || []).filter(e => 
         e.from_address === '0x0000000000000000000000000000000000000000'
       ).length;
