@@ -141,7 +141,7 @@
     }
 
     .nft-card {
-      height: calc(100dvh - 125px);
+      height: calc(100dvh - 125px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
       position: relative;
       background: var(--black);
       border-bottom: 1px solid var(--faint);
