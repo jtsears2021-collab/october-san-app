@@ -495,8 +495,8 @@
   <div style="box-shadow:0 0 0 1px var(--faint),0 0 40px rgba(107,173,232,0.9);border-radius:26px;animation:glow 3s ease-in-out infinite;margin-bottom:2rem;">
     <img src="/icon.png" style="width:100px;height:100px;border-radius:26px;display:block;" />
   </div>
-  <div style="font-family:'DM Mono',monospace;font-size:11px;letter-spacing:3px;color:var(--sky);margin-bottom:1rem;">CREATING YOUR WALLET</div>
-  <div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1px;color:var(--muted);line-height:1.8;max-width:280px;">October-San is creating your embedded NFT wallet address on the Polygon blockchain.</div>
+  <div style="font-family:'DM Mono',monospace;font-size:13px;letter-spacing:3px;color:var(--text);margin-bottom:1rem;">CREATING YOUR WALLET</div>
+  <div style="font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1px;color:var(--text);line-height:1.8;max-width:280px;">October-San is creating your embedded NFT wallet address on the Polygon blockchain.</div>
 </div>
 
 <!-- ONBOARDING OVERLAY -->
@@ -511,8 +511,13 @@
     <input type="text" class="username-input" id="username-input" placeholder="yourname" maxlength="20" autocapitalize="none" autocorrect="off" />
   </div>
   <div style="color:var(--text);font-size:11px;letter-spacing:1px;margin-bottom:16px;">This is not your Apple/Google ID — just your October-San username.</div>
-  <button class="btn-continue" onclick="completeOnboarding()">LET'S GO</button>
-    <button onclick="cancelOnboarding()" style="background:none;border:none;color:var(--muted);font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1px;cursor:pointer;margin-top:8px;">CANCEL</button>
+  <button class="btn-continue" onclick="completeOnboarding()" style="background:var(--black);color:var(--text);border:1px solid var(--faint);box-shadow:0 0 12px rgba(107,173,232,0.4);border-radius:4px;font-family:'DM Mono',monospace;font-size:11px;font-weight:700;letter-spacing:2px;padding:14px 32px;cursor:pointer;width:100%;display:flex;align-items:center;justify-content:center;gap:12px;">
+    <div style="box-shadow:0 0 0 1px var(--faint),0 0 12px rgba(107,173,232,0.8);border-radius:8px;flex-shrink:0;">
+      <img src="/icon.png" style="width:28px;height:28px;border-radius:8px;display:block;" />
+    </div>
+    LET'S GO
+  </button>
+    <button onclick="cancelOnboarding()" style="background:none;border:1px solid var(--faint);color:var(--text);font-family:'DM Mono',monospace;font-size:11px;font-weight:700;letter-spacing:2px;padding:14px 32px;cursor:pointer;width:100%;border-radius:4px;margin-top:8px;">CANCEL</button>
 </div>
   
 <!-- MAIN APP -->
@@ -674,7 +679,7 @@
 
       // Show wallet creation screen briefly
       document.getElementById('wallet-screen').style.display = 'flex';
-      await new Promise(r => setTimeout(r, 2500));
+      await new Promise(r => setTimeout(r, 6000));
       document.getElementById('wallet-screen').style.display = 'none';
 
       // New user — show onboarding
