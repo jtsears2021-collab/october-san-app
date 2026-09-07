@@ -641,8 +641,10 @@
       } catch(e) {
         console.log('Auto wallet connect:', e.message);
       }
+      loadFeed();
+    } else {
+      document.getElementById('signin-overlay').style.display = 'flex';
     }
-    loadFeed();
   }
 
   window.signIn = async function(strategy) {
