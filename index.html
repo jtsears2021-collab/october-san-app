@@ -651,10 +651,7 @@
       const account = await wallet.connect({ client, strategy, chain: polygon });
       connectedAccount = account;
       connectedWallet = wallet;
-
-      // Hide sign in overlay immediately
       document.getElementById('signin-overlay').style.display = 'none';
-
       try {
         const user = await wallet.getUser();
         console.log('Wallet user:', JSON.stringify(user));
@@ -662,7 +659,6 @@
         console.log('getUser error:', e.message);
       }
       console.log('Looking up wallet:', account.address);
-      // Look up username via wallet address (lowercase)
       try {
         const data = await firebaseGet(`walletLookup/${account.address.toLowerCase()}`);
         if (data.fields?.username) {
@@ -674,22 +670,11 @@
           return;
         }
       } catch(e) {}
-      // Show wallet creation screen briefly
       document.getElementById('wallet-screen').style.display = 'flex';
       await new Promise(r => setTimeout(r, 5000));
       document.getElementById('wallet-screen').style.display = 'none';
-      // New user — show onboarding
       currentUser = { userId: account.address, provider: strategy, walletAddress: account.address };
       document.getElementById('onboarding-overlay').classList.remove('hidden');
-    } catch(e) {
-      console.error('Sign in error:', e.message);
-    }
-  };
-  
-      // New user — show onboarding
-      currentUser = { userId: account.address, provider: strategy, walletAddress: account.address };
-      document.getElementById('onboarding-overlay').classList.remove('hidden');
-
     } catch(e) {
       console.error('Sign in error:', e.message);
     }
@@ -698,6 +683,12 @@
   window.browseWithoutSignIn = function() {
     document.getElementById('signin-overlay').style.display = 'none';
     loadFeed();
+  };
+
+  window.cancelOnboarding = function() {
+    document.getElementById('onboarding-overlay').classList.add('hidden');
+    localStorage.removeItem('octsn_user');
+    window.location.href = '/';
   };
 
   window.completeOnboarding = async function() {
@@ -710,13 +701,33 @@
       alert('Only letters, numbers and underscores allowed.');
       return;
     }
-
-  window.cancelOnboarding = function() {
+    try {
+      const check = await firebaseGet(`usernames/${username}`);
+      if (check.fields) {
+        alert('@' + username + ' is taken. Please choose another.');
+        return;
+      }
+    } catch(e) {}
+    const userId = currentUser.userId;
+    await firebaseSet(`users/${userId}`, {
+      username: { stringValue: username },
+      provider: { stringValue: currentUser.provider },
+      walletAddress: { stringValue: currentUser.walletAddress },
+      joinDate: { stringValue: new Date().toISOString() },
+    });
+    await firebaseSet(`usernames/${username}`, {
+      userId: { stringValue: userId }
+    });
+    await firebaseSet(`walletLookup/${currentUser.walletAddress.toLowerCase()}`, {
+      username: { stringValue: username }
+    });
+    currentUser = { ...currentUser, username };
+    localStorage.setItem('octsn_user', JSON.stringify(currentUser));
+    document.getElementById('header-username').textContent = '@' + username;
     document.getElementById('onboarding-overlay').classList.add('hidden');
-    localStorage.removeItem('octsn_user');
-    window.location.href = '/';
+    loadFeed();
   };
-
+  
     // Check availability
     try {
       const check = await firebaseGet(`usernames/${username}`);
