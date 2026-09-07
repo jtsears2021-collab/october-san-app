@@ -727,37 +727,6 @@
     document.getElementById('onboarding-overlay').classList.add('hidden');
     loadFeed();
   };
-  
-    // Check availability
-    try {
-      const check = await firebaseGet(`usernames/${username}`);
-      if (check.fields) {
-        alert('@' + username + ' is taken. Please choose another.');
-        return;
-      }
-    } catch(e) {}
-
-    // Save profile
-    const userId = currentUser.userId;
-    await firebaseSet(`users/${userId}`, {
-      username: { stringValue: username },
-      provider: { stringValue: currentUser.provider },
-      walletAddress: { stringValue: currentUser.walletAddress },
-      joinDate: { stringValue: new Date().toISOString() },
-    });
-    await firebaseSet(`usernames/${username}`, {
-      userId: { stringValue: userId }
-    });
-    await firebaseSet(`walletLookup/${currentUser.walletAddress.toLowerCase()}`, {
-      username: { stringValue: username }
-    });
-
-    currentUser = { ...currentUser, username };
-    localStorage.setItem('octsn_user', JSON.stringify(currentUser));
-    document.getElementById('header-username').textContent = '@' + username;
-    document.getElementById('onboarding-overlay').classList.add('hidden');
-    loadFeed();
-  };
 
   // ─── LOAD FEED ────────────────────────────────────────────
   async function loadFeed() {
