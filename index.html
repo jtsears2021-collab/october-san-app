@@ -652,13 +652,15 @@
       connectedAccount = account;
       connectedWallet = wallet;
 
+      // Hide sign in overlay immediately
+      document.getElementById('signin-overlay').style.display = 'none';
+
       try {
         const user = await wallet.getUser();
         console.log('Wallet user:', JSON.stringify(user));
       } catch(e) {
         console.log('getUser error:', e.message);
       }
-
       console.log('Looking up wallet:', account.address);
       // Look up username via wallet address (lowercase)
       try {
@@ -668,20 +670,22 @@
           currentUser = { userId: account.address, username, provider: strategy, walletAddress: account.address };
           localStorage.setItem('octsn_user', JSON.stringify(currentUser));
           document.getElementById('header-username').textContent = '@' + username;
-          document.getElementById('signin-overlay').style.display = 'none';
           loadFeed();
           return;
         }
       } catch(e) {}
-
-      // Hide sign in overlay first
-      document.getElementById('signin-overlay').style.display = 'none';
-
       // Show wallet creation screen briefly
       document.getElementById('wallet-screen').style.display = 'flex';
-      await new Promise(r => setTimeout(r, 6000));
+      await new Promise(r => setTimeout(r, 5000));
       document.getElementById('wallet-screen').style.display = 'none';
-
+      // New user — show onboarding
+      currentUser = { userId: account.address, provider: strategy, walletAddress: account.address };
+      document.getElementById('onboarding-overlay').classList.remove('hidden');
+    } catch(e) {
+      console.error('Sign in error:', e.message);
+    }
+  };
+  
       // New user — show onboarding
       currentUser = { userId: account.address, provider: strategy, walletAddress: account.address };
       document.getElementById('onboarding-overlay').classList.remove('hidden');
