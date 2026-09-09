@@ -480,6 +480,7 @@
         isVideo: nft.name?.toLowerCase().includes('video'),
         date: getDateFromName(nft.name),
       }));
+      console.log('First NFT owner_addresses:', allNFTs[0]?.owner_addresses);
 
       // Get unique dates
       availableDates = [...new Set(allNFTs.map(n => n.date).filter(Boolean))];
