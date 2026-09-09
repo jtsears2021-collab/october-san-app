@@ -513,6 +513,19 @@
         return { ...nft, listed: false };
       });
 
+      // Look up usernames for listed NFTs
+      allNFTs = await Promise.all(allNFTs.map(async (nft) => {
+        const address = nft.seller?.toLowerCase();
+        if (address) {
+          try {
+            const data = await firebaseGet(`walletLookup/${address}`);
+            const username = data.fields?.username?.stringValue;
+            return { ...nft, username: username || null };
+          } catch(e) {}
+        }
+        return { ...nft, username: null };
+      }));
+
       document.getElementById('loading').style.display = 'none';
       renderGrid();
 
@@ -528,7 +541,7 @@
     let filtered = allNFTs.filter(nft => {
       if (currentFilter === 'listed' && !nft.listed) return false;
       if (currentDate !== 'all' && nft.date !== currentDate) return false;
-      if (search && !nft.name?.toLowerCase().includes(search) && !nft.token_id.includes(search)) return false;
+      if (search && !nft.name?.toLowerCase().includes(search) && !nft.token_id.includes(search) && !nft.username?.toLowerCase().includes(search)) return false;
       return true;
     });
 
@@ -674,7 +687,7 @@
             <div class="snap-user" onclick="viewUserCollection('${ownerAddr}')">
               <div class="user-avatar">${ownerShort.charAt(0).toUpperCase()}</div>
               <div>
-                <div class="user-name">@${ownerShort}</div>
+                <div class="user-name">@${nft.username || ownerShort}</div>
                 <div class="nft-name-label">${nft.name || 'October-San Moment #' + nft.token_id}</div>
               </div>
             </div>
