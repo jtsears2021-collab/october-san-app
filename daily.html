@@ -429,6 +429,11 @@
   const FIREBASE_URL = 'https://firestore.googleapis.com/v1/projects/october-san-e3a33/databases/(default)/documents';
   const FIREBASE_API_KEY = 'AIzaSyBX6hKfUBi8oXx9ew22-jLpL4SxQJKoRIg';
 
+  async function firebaseGet(path) {
+    const res = await fetch(`${FIREBASE_URL}/${path}?key=${FIREBASE_API_KEY}`);
+    return res.json();
+  }
+
   let allNFTs = [];
   let activeListings = [];
   let currentFilter = 'all';
