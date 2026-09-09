@@ -784,14 +784,24 @@
         const listingId = isListed ? listing.listingId.toString() : null;
         const seller = isListed ? listing.listingCreator : null;
 
-        // Get owner
-        let ownerAddress = '';
+        // Get owner username
+        const address = (seller || nft.owner_addresses?.[0] || '').toLowerCase();
         let ownerUsername = '—';
-        ownerAddress = nft.owner_addresses?.[0] || '';
-        
-       ownerUsername = ownerAddress ? ownerAddress.substring(0,6) + '...' + ownerAddress.slice(-4) : '—';
-      
-        ownerUsername = userCache[ownerAddress] || ownerAddress.substring(0,6) + '...' + ownerAddress.slice(-4);
+        if (address) {
+          if (userCache[address]) {
+            ownerUsername = userCache[address];
+          } else {
+            try {
+              const userData = await firebaseGet(`walletLookup/${address}`);
+              const username = userData.fields?.username?.stringValue;
+              ownerUsername = username || address.substring(0,6) + '...' + address.slice(-4);
+              userCache[address] = ownerUsername;
+            } catch(e) {
+              ownerUsername = address.substring(0,6) + '...' + address.slice(-4);
+            }
+          }
+        }
+        const ownerAddress = address;
         
         const isOwner = currentUser?.walletAddress?.toLowerCase() === seller?.toLowerCase();
         return { tokenId, imageUrl, isVideo, isListed, priceInPOL, listingId, seller, ownerAddress, ownerUsername, isOwner, name: nft.name };
