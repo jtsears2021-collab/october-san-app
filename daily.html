@@ -544,7 +544,7 @@
             const wallet = mintDoc.fields?.wallet?.stringValue;
             const data = await firebaseGet(`walletLookup/${wallet}`);
             const username = data.fields?.username?.stringValue;
-            if (username) return { ...nft, username };
+            if (username) return { ...nft, username, seller: wallet };
           }
         } catch(e) {}
         return { ...nft, username: null };
@@ -693,10 +693,10 @@
 
     feed.style.height = snapH + 'px';
     feed.innerHTML = snapNFTs.map((nft, i) => {
-      const ownerShort = nft.owner_addresses?.[0]
-        ? nft.owner_addresses[0].substring(0,6) + '...' + nft.owner_addresses[0].slice(-4)
+      const ownerAddr = (nft.seller || nft.owner_addresses?.[0] || '');
+      const ownerShort = ownerAddr
+        ? ownerAddr.substring(0,6) + '...' + ownerAddr.slice(-4)
         : '—';
-      const ownerAddr = nft.owner_addresses?.[0] || '';
       const isOwner = currentUser?.walletAddress?.toLowerCase() === (nft.seller?.toLowerCase() || '');
       return `
         <div class="snap-card" style="height:${snapH}px;">
