@@ -866,7 +866,9 @@
   };
 
   window.viewProfile = function(address, username) {
-    window.location.href = '/profile?address=' + address;
+    if (address && address !== '') {
+      window.location.href = '/user?address=' + address;
+    }
   };
 
   // ─── SERVICE WORKER ───────────────────────────────────────
