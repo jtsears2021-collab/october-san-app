@@ -6,6 +6,7 @@
     { "source": "/daily", "destination": "/daily.html" },
     { "source": "/my", "destination": "/my.html" },
     { "source": "/profile", "destination": "/profile.html" },
-    { "source": "/mint", "destination": "/mint.html" }
+    { "source": "/mint", "destination": "/mint.html" },
+    { "source": "/user", "destination": "/user.html" }
   ]
 }
