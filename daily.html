@@ -756,6 +756,7 @@
   }
 
   window.viewUserCollection = function(address) {
+    console.log('viewUserCollection called:', address);
     if (address) window.location.href = '/user?address=' + address;
   };
 
