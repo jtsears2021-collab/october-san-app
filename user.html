@@ -59,6 +59,53 @@
       letter-spacing: 1px;
     }
 
+    /* ─── FILTERS ─── */
+    #filters {
+      flex-shrink: 0;
+      background: var(--black);
+      border-bottom: 1px solid var(--faint);
+      padding: 8px 16px;
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    #filters::-webkit-scrollbar { display: none; }
+    .filter-btn {
+      background: transparent;
+      border: 1px solid var(--faint);
+      border-radius: 20px;
+      color: var(--text);
+      font-family: 'DM Mono', monospace;
+      font-size: 9px;
+      letter-spacing: 1.5px;
+      padding: 5px 12px;
+      cursor: pointer;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .filter-btn.active { background: var(--sky); border-color: var(--sky); color: var(--black); }
+
+    /* ─── SEARCH ─── */
+    #search-bar {
+      flex-shrink: 0;
+      padding: 8px 16px;
+      border-bottom: 1px solid var(--faint);
+    }
+    .search-input {
+      background: var(--card);
+      border: 1px solid var(--faint);
+      border-radius: 4px;
+      color: var(--text);
+      font-family: 'DM Mono', monospace;
+      font-size: 16px;
+      padding: 8px 12px;
+      width: 100%;
+      outline: none;
+    }
+    .search-input:focus { border-color: var(--sky); }
+
     /* ─── GRID ─── */
     #grid-container {
       flex: 1;
@@ -199,6 +246,19 @@
     <div class="header-stats" id="header-stats"></div>
   </div>
 
+  <!-- FILTERS -->
+  <div id="filters">
+    <button class="filter-btn active" onclick="setFilter('all')" id="f-all">ALL</button>
+    <button class="filter-btn" onclick="setFilter('listed')" id="f-listed">LISTED</button>
+    <button class="filter-btn" onclick="toggleSort()" id="f-sort">NEWEST ↓</button>
+    <button class="filter-btn" onclick="openDatePicker()" id="f-date">ALL DATES ▾</button>
+  </div>
+
+  <!-- SEARCH -->
+  <div id="search-bar">
+    <input type="search" class="search-input" placeholder="🔍" id="search-input" oninput="renderGrid()" />
+  </div>
+
   <!-- GRID -->
   <div id="grid-container">
     <div id="loading" class="loading">
@@ -248,6 +308,16 @@
 
   let userNFTs = [];
   let snapNFTs = [];
+  let currentFilter = 'all';
+  let currentSort = 'newest';
+  let currentDate = 'all';
+  let availableDates = [];
+
+  function getDateFromName(name) {
+    if (!name) return null;
+    const match = name.match(/(\w+ \d+, \d{4})/);
+    return match ? match[1] : null;
+  }
 
   function ipfsUrl(url) {
     if (!url) return null;
@@ -339,14 +409,31 @@
   function renderGrid() {
     document.getElementById('loading').style.display = 'none';
     
-    if (userNFTs.length === 0) {
+    const search = document.getElementById('search-input')?.value.toLowerCase() || '';
+    let filtered = userNFTs.filter(nft => {
+      if (currentFilter === 'listed' && !nft.listed) return false;
+      if (currentDate !== 'all' && nft.date !== currentDate) return false;
+      if (search && !nft.name?.toLowerCase().includes(search) && !nft.token_id?.includes(search)) return false;
+      return true;
+    });
+
+    filtered = filtered.sort((a, b) =>
+      currentSort === 'newest'
+        ? parseInt(b.token_id) - parseInt(a.token_id)
+        : parseInt(a.token_id) - parseInt(b.token_id)
+    );
+
+    snapNFTs = filtered;
+
+    if (filtered.length === 0) {
+      document.getElementById('nft-grid').style.display = 'none';
       document.getElementById('empty').style.display = 'block';
       return;
     }
 
-    snapNFTs = userNFTs;
+    document.getElementById('empty').style.display = 'none';
     document.getElementById('nft-grid').style.display = 'grid';
-    document.getElementById('nft-grid').innerHTML = userNFTs.map((nft, i) => `
+    document.getElementById('nft-grid').innerHTML = filtered.map((nft, i) => `
       <div class="grid-item ${nft.listed ? 'listed' : ''}" onclick="openSnap(${i})">
         ${nft.image_url
           ? nft.isVideo
@@ -358,7 +445,6 @@
       </div>
     `).join('');
 
-    // Video thumbnails
     const gridObserver = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
         const video = entry.target;
@@ -372,6 +458,55 @@
     }, { threshold: 0.1 });
     document.querySelectorAll('.grid-item video').forEach(v => gridObserver.observe(v));
   }
+
+  window.setFilter = function(f) {
+    currentFilter = f;
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('f-' + f).classList.add('active');
+    document.getElementById('f-sort').classList.add('active');
+    renderGrid();
+  };
+
+  window.toggleSort = function() {
+    currentSort = currentSort === 'newest' ? 'oldest' : 'newest';
+    document.getElementById('f-sort').textContent = currentSort === 'newest' ? 'NEWEST ↓' : 'OLDEST ↓';
+    renderGrid();
+  };
+
+  window.openDatePicker = function() {
+    const existing = document.getElementById('date-sheet');
+    if (existing) { existing.remove(); return; }
+    const sheet = document.createElement('div');
+    sheet.id = 'date-sheet';
+    sheet.style.cssText = 'position:fixed;bottom:0;left:0;right:0;background:var(--card);border-radius:16px 16px 0 0;padding:1rem;z-index:600;max-height:50vh;overflow-y:auto;border-top:1px solid var(--faint);';
+    const dates = ['All Dates', ...availableDates];
+    sheet.innerHTML = `
+      <div style="width:40px;height:4px;background:var(--faint);border-radius:2px;margin:0 auto 1rem;"></div>
+      <div style="font-size:9px;letter-spacing:2px;color:var(--muted);text-align:center;margin-bottom:0.75rem;">SELECT DATE</div>
+      ${dates.map((d, i) => `
+        <div onclick="selectDate('${i === 0 ? 'all' : d}', '${i === 0 ? 'ALL DATES' : d}')"
+             style="padding:12px 16px;border-bottom:1px solid var(--faint);cursor:pointer;font-size:11px;letter-spacing:1px;color:${currentDate === (i === 0 ? 'all' : d) ? 'var(--sky)' : 'var(--text)'};">
+          ${d}
+        </div>
+      `).join('')}
+    `;
+    document.body.appendChild(sheet);
+    setTimeout(() => {
+      document.addEventListener('click', function closeSheet(e) {
+        if (!sheet.contains(e.target) && e.target.id !== 'f-date') {
+          sheet.remove();
+          document.removeEventListener('click', closeSheet);
+        }
+      });
+    }, 100);
+  };
+
+  window.selectDate = function(date, label) {
+    currentDate = date;
+    document.getElementById('f-date').textContent = label + ' ▾';
+    document.getElementById('date-sheet')?.remove();
+    renderGrid();
+  };
 
   window.openSnap = function(startIndex) {
     document.getElementById('snap-overlay').classList.add('visible');
