@@ -803,7 +803,7 @@
         }
         const ownerAddress = address;
         
-        const isOwner = currentUser?.walletAddress?.toLowerCase() === seller?.toLowerCase();
+        const isOwner = !!(currentUser && seller && currentUser?.walletAddress?.toLowerCase() === seller?.toLowerCase());
         return { tokenId, imageUrl, isVideo, isListed, priceInPOL, listingId, seller, ownerAddress, ownerUsername, isOwner, name: nft.name };
       }));
 
