@@ -306,7 +306,10 @@
   </div>
 
   <div id="search-bar">
-    <input type="search" class="search-input" placeholder="🔍" id="search-input" oninput="renderGrid()" />
+    <div style="position:relative;">
+      <svg style="position:absolute;left:10px;top:50%;transform:translateY(-50%);opacity:0.4;" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="search" class="search-input" placeholder="Search..." id="search-input" oninput="renderGrid()" style="padding-left:32px;" />
+    </div>
   </div>
 
   <div id="grid-container">
