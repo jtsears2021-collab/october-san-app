@@ -371,7 +371,7 @@
     <button class="filter-btn active" onclick="setFilter('all')" id="f-all">ALL</button>
     <button class="filter-btn" onclick="setFilter('listed')" id="f-listed">LISTED</button>
     <button class="filter-btn" onclick="toggleSort()" id="f-sort">NEWEST ↓</button>
-    <button class="filter-btn" onclick="openDatePicker()" id="f-date">ALL DATES ▾</button>
+    <button class="filter-btn" onclick="openDatePicker()" id="f-date">ALL COLLECTIONS ▾</button>
   </div>
 
   <!-- SEARCH -->
@@ -643,12 +643,12 @@
     sheet.id = 'date-sheet';
     sheet.style.cssText = 'position:fixed;bottom:0;left:0;right:0;background:var(--card);border-radius:16px 16px 0 0;padding:1rem;z-index:600;max-height:50vh;overflow-y:auto;border-top:1px solid var(--faint);';
     
-    const dates = ['All Dates', ...availableDates];
+    const dates = ['All Collections', ...availableDates];
     sheet.innerHTML = `
       <div style="width:40px;height:4px;background:var(--faint);border-radius:2px;margin:0 auto 1rem;"></div>
-      <div style="font-size:9px;letter-spacing:2px;color:var(--muted);text-align:center;margin-bottom:0.75rem;">SELECT DATE</div>
+      <div style="font-size:9px;letter-spacing:2px;color:var(--muted);text-align:center;margin-bottom:0.75rem;">SELECT COLLECTION</div>
       ${dates.map((d, i) => `
-        <div onclick="selectDate('${i === 0 ? 'all' : d}', '${i === 0 ? 'ALL DATES' : d}')" 
+        <div onclick="selectDate('${i === 0 ? 'all' : d}', '${i === 0 ? 'ALL COLLECTIONS' : d}')" 
              style="padding:12px 16px;border-bottom:1px solid var(--faint);cursor:pointer;font-size:11px;letter-spacing:1px;color:${currentDate === (i === 0 ? 'all' : d) ? 'var(--sky)' : 'var(--text)'};">
           ${d}
         </div>
