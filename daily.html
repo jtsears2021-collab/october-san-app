@@ -457,14 +457,14 @@
 
   function getDateFromName(name) {
     if (!name) return null;
-    // Try to get game title (everything before the date)
     const match = name.match(/^(.+?)\s*·\s*(\w+ \d+, \d{4})/);
-    if (match) return match[1].trim() + ' · ' + match[2].trim();
-    // Fallback to just date
+    if (match) {
+      const title = match[1].replace(/\s*video\s*/i, '').trim();
+      return title + ' · ' + match[2].trim();
+    }
     const dateMatch = name.match(/(\w+ \d+, \d{4})/);
     return dateMatch ? dateMatch[1] : null;
   }
-
   function ipfsUrl(url) {
     if (!url) return null;
     return url.startsWith('ipfs://') ? `https://${CLIENT_ID}.ipfscdn.io/ipfs/${url.slice(7)}` : url;
