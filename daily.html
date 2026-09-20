@@ -593,7 +593,7 @@
       <div class="thumb" onclick="openSnap(${i})">
         ${nft.image_url
           ? nft.isVideo
-            ? `<video data-src="${nft.image_url}" muted playsinline loop preload="none" style="width:100%;height:100%;object-fit:cover;"></video>`
+            ? `<video data-src="${nft.image_url}" playsinline loop preload="none" style="width:100%;height:100%;object-fit:cover;"></video>`
             : `<img src="${nft.image_url}" loading="lazy" />`
           : `<div class="thumb-placeholder">◆</div>`
         }
