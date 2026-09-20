@@ -457,8 +457,12 @@
 
   function getDateFromName(name) {
     if (!name) return null;
-    const match = name.match(/(\w+ \d+, \d{4})/);
-    return match ? match[1] : null;
+    // Try to get game title (everything before the date)
+    const match = name.match(/^(.+?)\s*·\s*(\w+ \d+, \d{4})/);
+    if (match) return match[1].trim() + ' · ' + match[2].trim();
+    // Fallback to just date
+    const dateMatch = name.match(/(\w+ \d+, \d{4})/);
+    return dateMatch ? dateMatch[1] : null;
   }
 
   function ipfsUrl(url) {
