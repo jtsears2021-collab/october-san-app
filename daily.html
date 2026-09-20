@@ -690,6 +690,11 @@
   };
 
   window.closeSnap = function() {
+    // Mute all videos before closing
+    document.querySelectorAll('video').forEach(v => {
+      v.muted = true;
+      v.pause();
+    });
     document.getElementById('snap-overlay').classList.remove('visible');
     document.getElementById('snap-feed').innerHTML = '';
   };
