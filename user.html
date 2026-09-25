@@ -318,8 +318,13 @@
 
   function getDateFromName(name) {
     if (!name) return null;
-    const match = name.match(/(\w+ \d+, \d{4})/);
-    return match ? match[1] : null;
+    const match = name.match(/^(.+?)\s*·\s*(\w+ \d+, \d{4})/);
+    if (match) {
+      const title = match[1].replace(/\s*video\s*/i, '').trim();
+      return title + ' · ' + match[2].trim();
+    }
+    const dateMatch = name.match(/(\w+ \d+, \d{4})/);
+    return dateMatch ? dateMatch[1] : null;
   }
 
   function ipfsUrl(url) {
@@ -354,6 +359,7 @@
         ...nft,
         image_url: ipfsUrl(nft.image_url),
         isVideo: nft.name?.toLowerCase().includes('video'),
+        date: getDateFromName(nft.name),
       }));
 
       // Fetch marketplace listings
@@ -396,7 +402,12 @@
           listed: true,
           price_pol: ethers.utils.formatEther(l.pricePerToken),
         }));
-      userNFTs = [...userNFTs, ...listedOnly];
+      userNFTs = [...userNFTs, ...listedOnly].map(nft => ({
+        ...nft,
+        date: getDateFromName(nft.name),
+      }));
+
+      availableDates = [...new Set(userNFTs.map(n => n.date).filter(Boolean))];
 
       document.getElementById('header-stats').textContent = `${userNFTs.length} MOMENTS`;
 
