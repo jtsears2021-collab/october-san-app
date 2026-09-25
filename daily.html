@@ -118,50 +118,62 @@
     }
     .grid {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 4px;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.75rem;
     }
-    .thumb {
-      position: relative;
-      aspect-ratio: 3/4;
+    .nft-card {
       background: var(--card);
-      cursor: pointer;
+      border: 1px solid var(--faint);
+      border-radius: 8px;
       overflow: hidden;
-      border-radius: 2px;
+      cursor: pointer;
+      transition: border-color 0.2s;
     }
-    .thumb img, .thumb video {
+    .nft-card.listed { border-color: var(--sky); }
+    .nft-thumb {
       width: 100%;
-      height: 100%;
+      aspect-ratio: 3/4;
       object-fit: cover;
       display: block;
+      background: var(--black);
     }
-    .thumb-token {
-      position: absolute;
-      top: 4px;
-      left: 4px;
-      background: rgba(8,10,14,0.7);
-      color: var(--sky);
-      font-size: 8px;
-      font-weight: 700;
-      letter-spacing: 0.5px;
-      padding: 2px 6px;
-      border-radius: 2px;
-    }
-    .thumb-listed {
-      position: absolute;
-      inset: 0;
-      border: 2px solid var(--sky);
-      border-radius: 2px;
-      pointer-events: none;
-    }
-    .thumb-placeholder {
+    .nft-thumb-placeholder {
       width: 100%;
-      height: 100%;
+      aspect-ratio: 3/4;
+      background: var(--black);
       display: flex;
       align-items: center;
       justify-content: center;
       color: var(--muted);
-      font-size: 1.2rem;
+      font-size: 1.5rem;
+    }
+    .nft-info {
+      padding: 10px 12px;
+    }
+    .nft-token {
+      font-size: 10px;
+      color: var(--sky);
+      letter-spacing: 1px;
+      margin-bottom: 4px;
+    }
+    .nft-name {
+      font-size: 11px;
+      color: var(--text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-bottom: 6px;
+    }
+    .nft-price {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1rem;
+      color: var(--green);
+      letter-spacing: 0.05em;
+    }
+    .nft-price-sub {
+      font-size: 9px;
+      color: var(--muted);
+      letter-spacing: 0.5px;
     }
 
     /* ─── SNAP SCROLL OVERLAY ─── */
@@ -593,18 +605,21 @@
     document.getElementById('empty').style.display = 'none';
     document.getElementById('grid').style.display = 'grid';
     document.getElementById('grid').innerHTML = filtered.map((nft, i) => `
-      <div class="thumb" onclick="openSnap(${i})">
+      <div class="nft-card ${nft.listed ? 'listed' : ''}" onclick="openSnap(${i})">
         ${nft.image_url
           ? nft.isVideo
-            ? `<video data-src="${nft.image_url}" muted playsinline loop preload="none" style="width:100%;height:100%;object-fit:cover;"></video>`
-            : `<img src="${nft.image_url}" loading="lazy" />`
-          : `<div class="thumb-placeholder">◆</div>`
+            ? `<video data-src="${nft.image_url}" muted playsinline loop preload="none" style="width:100%;aspect-ratio:3/4;object-fit:cover;display:block;"></video>`
+            : `<img class="nft-thumb" src="${nft.image_url}" loading="lazy" />`
+          : `<div class="nft-thumb-placeholder">◆</div>`
         }
-        <div class="thumb-token">#${nft.token_id}</div>
-        ${nft.listed ? '<div class="thumb-listed"></div>' : ''}
+        <div class="nft-info">
+          <div class="nft-token">#${nft.token_id} · @${nft.username || '—'}</div>
+          <div class="nft-name">${nft.name || 'October-San Moment #' + nft.token_id}</div>
+          ${nft.listed ? `<div class="nft-price">${parseFloat(nft.price_pol).toFixed(2)} POL</div>` : '<div class="nft-price-sub">NOT LISTED</div>'}
+        </div>
       </div>
     `).join('');
-
+    
     // Ensure all grid videos are muted
     document.querySelectorAll('#grid video').forEach(v => {
       v.muted = true;
