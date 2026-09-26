@@ -716,8 +716,10 @@
       showSuccess({ ...result, imageUrl: displayUrl });
 
     } catch(e) {
-      console.error('Mint error:', e);
-      alert('Minting failed: ' + e.message + '\n\nPlease try again.');
+      console.error('Mint error full:', e);
+      console.error('Mint error message:', e.message);
+      console.error('Mint error stack:', e.stack);
+      alert('Minting failed: ' + JSON.stringify(e) + ' | ' + e.message + ' | ' + e.stack);
       showScreen('preview-screen');
     }
   };
