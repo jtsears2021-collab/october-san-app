@@ -637,10 +637,27 @@
 
       // Upload metadata
       const today = new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+      // Get current mint count for edition number
+      const collectionRes = await fetch(
+        `https://firestore.googleapis.com/v1/projects/october-san-e3a33/databases/(default)/documents/collections/current?key=AIzaSyBX6hKfUBi8oXx9ew22-jLpL4SxQJKoRIg`
+      );
+      const collectionData = await collectionRes.json();
+      const mintCount = parseInt(collectionData.fields?.mintCount?.integerValue || '0');
+      const teams = collectionData.fields?.teams?.stringValue || '';
+
       const metadataObj = {
         name: `${gameTitle}${capturedType === 'video' ? ' Video' : ''} · ${today}`,
-        description: `A fan-captured ${capturedType} moment at ${gameTitle}. Collection #${collectionNum}.`,
+        description: `Fan-minted live from inside Dodger Stadium. Mint #${mintCount} of this game's collection.`,
         image: imageUrl,
+        attributes: [
+          { trait_type: 'Venue', value: 'Dodger Stadium' },
+          { trait_type: 'Teams', value: teams },
+          { trait_type: 'Collection', value: String(collectionNum) },
+          { trait_type: 'Date', value: today },
+          { trait_type: 'Type', value: capturedType === 'video' ? 'Video' : 'Photo' },
+          { trait_type: 'Season', value: '2026' },
+          { trait_type: 'Edition', value: `Mint #${mintCount}` },
+        ]
       };
       const metadataBlob = new Blob([JSON.stringify(metadataObj)], { type: 'application/json' });
       const metadataForm = new FormData();
