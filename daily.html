@@ -575,11 +575,11 @@
             const wallet = mintDoc.fields?.wallet?.stringValue;
             const data = await firebaseGet(`walletLookup/${wallet}`);
             username = data.fields?.username?.stringValue || null;
-            if (username) return { ...nft, username, seller: wallet };
+            if (username) , seller: wallet };
           }
         } catch(e) {}
 
-        return { ...nft, username: null };
+        return { ...nft, username: null, ownerShortAddress: ownerAddress ? ownerAddress.substring(0,6) + '...' + ownerAddress.slice(-4) : null };
       }));
 
       document.getElementById('loading').style.display = 'none';
@@ -759,7 +759,7 @@
             <div class="snap-user" onclick="viewUserCollection('${ownerAddr}')">
               <div class="user-avatar">${ownerShort.charAt(0).toUpperCase()}</div>
               <div>
-                <div class="user-name">@${nft.username || ownerShort}</div>
+                <div class="user-name">@${nft.username || nft.ownerShortAddress || '—'}</div>
                 <div class="nft-name-label">${nft.name || 'October-San Moment #' + nft.token_id}</div>
               </div>
             </div>
