@@ -785,24 +785,39 @@
         const listingId = isListed ? listing.listingId.toString() : null;
         const seller = isListed ? listing.listingCreator : null;
 
-        // Get owner username
-        const address = (seller || nft.owner_addresses?.[0] || '').toLowerCase();
+        // Priority: seller → ownership collection → mints collection
+        let ownerAddress = seller?.toLowerCase() || '';
         let ownerUsername = '—';
-        if (address) {
-          if (userCache[address]) {
-            ownerUsername = userCache[address];
+
+        if (!ownerAddress) {
+          try {
+            const ownerData = await firebaseGet(`ownership/${tokenId}`);
+            ownerAddress = ownerData.fields?.wallet?.stringValue || '';
+          } catch(e) {}
+        }
+
+        if (!ownerAddress) {
+          try {
+            const mintsData = await firebaseGet(`mints`);
+            const mintDoc = (mintsData.documents || []).find(d =>
+              d.fields?.tokenId?.stringValue === tokenId
+            );
+            if (mintDoc) ownerAddress = mintDoc.fields?.wallet?.stringValue || '';
+          } catch(e) {}
+        }
+
+        if (ownerAddress) {
+          if (userCache[ownerAddress]) {
+            ownerUsername = userCache[ownerAddress];
           } else {
             try {
-              const userData = await firebaseGet(`walletLookup/${address}`);
+              const userData = await firebaseGet(`walletLookup/${ownerAddress}`);
               const username = userData.fields?.username?.stringValue;
-              ownerUsername = username || address.substring(0,6) + '...' + address.slice(-4);
-              userCache[address] = ownerUsername;
-            } catch(e) {
-              ownerUsername = address.substring(0,6) + '...' + address.slice(-4);
-            }
+              ownerUsername = username || ownerAddress.substring(0,6) + '...' + ownerAddress.slice(-4);
+              userCache[ownerAddress] = ownerUsername;
+            } catch(e) {}
           }
         }
-        const ownerAddress = address;
         
         const isOwner = !!(currentUser && seller && currentUser?.walletAddress?.toLowerCase() === seller?.toLowerCase());
         return { tokenId, imageUrl, isVideo, isListed, priceInPOL, listingId, seller, ownerAddress, ownerUsername, isOwner, name: nft.name };
