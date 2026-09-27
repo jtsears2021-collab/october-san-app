@@ -539,13 +539,7 @@
       });
 
       // Look up usernames — priority: seller → ownership → mints
-      try {
-        allNFTs = await Promise.all(allNFTs.map(async (nft) => {
-          // ... existing lookup code
-        }));
-      } catch(e) {
-        console.log('Username lookup error:', e.message);
-      }
+      allNFTs = await Promise.all(allNFTs.map(async (nft) => {
         let ownerAddress = nft.seller?.toLowerCase() || '';
         let username = null;
 
