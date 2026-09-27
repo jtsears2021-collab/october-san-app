@@ -706,6 +706,26 @@
       });
 
       await sendTransaction({ transaction: tx, account: connectedAccount });
+
+      // Update ownership in Firebase
+      try {
+        await fetch(
+          `https://firestore.googleapis.com/v1/projects/october-san-e3a33/databases/(default)/documents/ownership/${tokenId}`,
+          {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              fields: {
+                wallet: { stringValue: recipientAddress.toLowerCase() },
+                tokenId: { stringValue: tokenId },
+                updatedAt: { stringValue: new Date().toISOString() }
+              }
+            })
+          }
+        );
+      } catch(e) {
+        console.log('Ownership update error:', e.message);
+      }
       
       document.getElementById('send-sheet').remove();
       alert('✅ Moment sent successfully!');
