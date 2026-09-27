@@ -611,6 +611,7 @@
     );
 
     snapNFTs = filtered;
+    console.log('Token 22 in snapNFTs:', snapNFTs.find(n => n.token_id === '22'));
 
     if (filtered.length === 0) {
       document.getElementById('grid').style.display = 'none';
