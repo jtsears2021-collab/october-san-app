@@ -756,8 +756,8 @@
           }
           <div class="snap-card-token">#${nft.token_id}</div>
           <div class="snap-card-overlay">
-            <div class="snap-user" onclick="viewUserCollection('${ownerAddr}')">
-              <div class="user-avatar">${ownerShort.charAt(0).toUpperCase()}</div>
+            <div class="snap-user" onclick="viewUserCollection('${nft.seller || ''}')">
+              <div class="user-avatar">${(nft.username || nft.ownerShortAddress || '—').charAt(0).toUpperCase()}</div>
               <div>
                 <div class="user-name">@${nft.username || nft.ownerShortAddress || '—'}</div>
                 <div class="nft-name-label">${nft.name || 'October-San Moment #' + nft.token_id}</div>
