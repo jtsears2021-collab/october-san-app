@@ -746,6 +746,7 @@
     feed.style.height = snapH + 'px';
     feed.innerHTML = snapNFTs.map((nft, i) => {
       const ownerAddr = nft.seller || nft.ownerFullAddress || '';
+      if (nft.token_id === '22') console.log('Snap card ownerAddr:', ownerAddr, 'seller:', nft.seller, 'ownerFull:', nft.ownerFullAddress);
       const ownerShort = nft.username || nft.ownerShortAddress || '—';
       const isOwner = currentUser?.walletAddress?.toLowerCase() === (nft.seller?.toLowerCase() || '');
       return `
