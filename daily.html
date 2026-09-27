@@ -538,34 +538,47 @@
         return { ...nft, listed: false };
       });
 
-      // Look up usernames from Firebase mints collection
+      // Look up usernames — priority: seller → ownership → mints
       allNFTs = await Promise.all(allNFTs.map(async (nft) => {
-        // First try seller address (listed NFTs)
-        const address = nft.seller?.toLowerCase();
-        if (address) {
+        let ownerAddress = nft.seller?.toLowerCase() || '';
+        let username = null;
+
+        // 1. Try seller address (listed NFTs)
+        if (ownerAddress) {
           try {
-            const data = await firebaseGet(`walletLookup/${address}`);
-            const username = data.fields?.username?.stringValue;
-            if (username) return { ...nft, username };
+            const data = await firebaseGet(`walletLookup/${ownerAddress}`);
+            username = data.fields?.username?.stringValue || null;
+            if (username) return { ...nft, username, seller: ownerAddress };
           } catch(e) {}
         }
-        // Then try mints collection (unlisted NFTs)
+
+        // 2. Try ownership collection (current owner)
+        if (!ownerAddress) {
+          try {
+            const ownerData = await firebaseGet(`ownership/${nft.token_id}`);
+            ownerAddress = ownerData.fields?.wallet?.stringValue || '';
+            if (ownerAddress) {
+              const data = await firebaseGet(`walletLookup/${ownerAddress}`);
+              username = data.fields?.username?.stringValue || null;
+              if (username) return { ...nft, username, seller: ownerAddress };
+            }
+          } catch(e) {}
+        }
+
+        // 3. Try mints collection (original minter)
         try {
-          const mintsRes = await fetch(
-            `${FIREBASE_URL}?key=${FIREBASE_API_KEY}&pageSize=1`,
-          );
-          // Query mints where tokenId matches
           const mintsData = await firebaseGet(`mints`);
-          const mintDoc = (mintsData.documents || []).find(d => 
+          const mintDoc = (mintsData.documents || []).find(d =>
             d.fields?.tokenId?.stringValue === nft.token_id
           );
           if (mintDoc) {
             const wallet = mintDoc.fields?.wallet?.stringValue;
             const data = await firebaseGet(`walletLookup/${wallet}`);
-            const username = data.fields?.username?.stringValue;
+            username = data.fields?.username?.stringValue || null;
             if (username) return { ...nft, username, seller: wallet };
           }
         } catch(e) {}
+
         return { ...nft, username: null };
       }));
 
