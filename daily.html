@@ -579,7 +579,7 @@
           }
         } catch(e) {}
 
-        return { ...nft, username: null, ownerShortAddress: ownerAddress ? ownerAddress.substring(0,6) + '...' + ownerAddress.slice(-4) : null };
+        return { ...nft, username: null, ownerShortAddress: ownerAddress ? ownerAddress.substring(0,6) + '...' + ownerAddress.slice(-4) : null, ownerFullAddress: ownerAddress || '' };
       }));
 
       document.getElementById('loading').style.display = 'none';
@@ -734,14 +734,12 @@
 
   function renderSnapFeed(startIndex) {
     const feed = document.getElementById('snap-feed');
-    const snapH = window.innerHeight - 56; // subtract snap header
+    const snapH = window.innerHeight - 56;
 
     feed.style.height = snapH + 'px';
     feed.innerHTML = snapNFTs.map((nft, i) => {
-      const ownerAddr = (nft.seller || nft.owner_addresses?.[0] || '');
-      const ownerShort = ownerAddr
-        ? ownerAddr.substring(0,6) + '...' + ownerAddr.slice(-4)
-        : '—';
+      const ownerAddr = nft.seller || nft.ownerFullAddress || '';
+      const ownerShort = nft.username || nft.ownerShortAddress || '—';
       const isOwner = currentUser?.walletAddress?.toLowerCase() === (nft.seller?.toLowerCase() || '');
       return `
         <div class="snap-card" style="height:${snapH}px;">
