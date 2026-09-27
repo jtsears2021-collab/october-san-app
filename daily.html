@@ -560,7 +560,8 @@
             if (ownerAddress) {
               const data = await firebaseGet(`walletLookup/${ownerAddress}`);
               username = data.fields?.username?.stringValue || null;
-              if (username) return { ...nft, username, seller: ownerAddress };
+              if (username) return { ...nft, username, seller: ownerAddress, ownerFullAddress: ownerAddress };
+              return { ...nft, username: null, ownerFullAddress: ownerAddress, ownerShortAddress: ownerAddress.substring(0,6) + '...' + ownerAddress.slice(-4) };
             }
           } catch(e) {}
         }
