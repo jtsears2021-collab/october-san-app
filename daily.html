@@ -581,7 +581,7 @@
             const wallet = mintDoc.fields?.wallet?.stringValue;
             const data = await firebaseGet(`walletLookup/${wallet}`);
             username = data.fields?.username?.stringValue || null;
-            if (username) , seller: wallet };
+            if (username) return { ...nft, username, seller: wallet };
           }
         } catch(e) {}
 
