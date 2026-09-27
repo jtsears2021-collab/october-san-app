@@ -575,6 +575,26 @@
 
       console.log('Buy result:', JSON.stringify(result));
 
+      // Update ownership in Firebase
+      try {
+        await fetch(
+          `https://firestore.googleapis.com/v1/projects/october-san-e3a33/databases/(default)/documents/ownership/${tokenId}`,
+          {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              fields: {
+                wallet: { stringValue: connectedAccount.address.toLowerCase() },
+                tokenId: { stringValue: tokenId.toString() },
+                updatedAt: { stringValue: new Date().toISOString() }
+              }
+            })
+          }
+        );
+      } catch(e) {
+        console.log('Ownership update error:', e.message);
+      }
+
       // Success!
       const txHash = result.transactionHash || result.hash || '';
       document.getElementById('nft-content').style.display = 'none';
