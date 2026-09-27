@@ -626,7 +626,7 @@
           : `<div class="nft-thumb-placeholder">◆</div>`
         }
         <div class="nft-info">
-          <div class="nft-token">#${nft.token_id} · @${nft.username || '—'}</div>
+          <div class="nft-token">#${nft.token_id} · @${nft.username || nft.ownerShortAddress || '—'}</div>
           <div class="nft-name">${nft.name || 'October-San Moment #' + nft.token_id}</div>
           ${nft.listed ? `<div class="nft-price">${parseFloat(nft.price_pol).toFixed(2)} POL</div>` : '<div class="nft-price-sub">NOT LISTED</div>'}
         </div>
