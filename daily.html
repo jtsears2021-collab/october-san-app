@@ -553,6 +553,7 @@
         }
 
         // 2. Try ownership collection (current owner)
+        console.log('Token:', nft.token_id, 'ownerAddress before ownership check:', ownerAddress);
         if (!ownerAddress) {
           try {
             const ownerData = await firebaseGet(`ownership/${nft.token_id}`);
