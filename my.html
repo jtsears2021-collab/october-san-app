@@ -660,8 +660,30 @@
   };
 
   window.sendNFT = async function(tokenId) {
-    const recipientAddress = document.getElementById('send-address').value.trim();
-    if (!recipientAddress || !recipientAddress.startsWith('0x')) {
+    let recipientAddress = document.getElementById('send-address').value.trim();
+    if (!recipientAddress) {
+      alert('Please enter a valid wallet address.');
+      return;
+    }
+
+    // Resolve ENS name if needed
+    if (recipientAddress.endsWith('.eth')) {
+      try {
+        const { ethers } = await import('https://esm.sh/ethers@5.7.2');
+        const provider = new ethers.providers.JsonRpcProvider(`https://eth.rpc.thirdweb.com/${CLIENT_ID}`);
+        const resolved = await provider.resolveName(recipientAddress);
+        if (!resolved) {
+          alert('Could not resolve ENS name. Please check and try again.');
+          return;
+        }
+        recipientAddress = resolved;
+      } catch(e) {
+        alert('ENS resolution failed. Please use a wallet address directly.');
+        return;
+      }
+    }
+
+    if (!recipientAddress.startsWith('0x')) {
       alert('Please enter a valid wallet address.');
       return;
     }
