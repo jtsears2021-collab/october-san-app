@@ -666,6 +666,24 @@
       return;
     }
 
+    // Reconnect wallet if needed
+    if (!connectedAccount) {
+      try {
+        const { inAppWallet } = await import('https://esm.sh/thirdweb@5.120.1/wallets');
+        const wallet = inAppWallet();
+        const account = await wallet.connect({
+          client,
+          strategy: currentUser.provider === 'google' ? 'google' : 'apple',
+          chain: polygon,
+        });
+        connectedAccount = account;
+        connectedWallet = wallet;
+      } catch(e) {
+        alert('Please sign in again to send.');
+        return;
+      }
+    }
+
     const btn = document.querySelector('#send-sheet button');
     btn.textContent = 'SENDING...';
     btn.disabled = true;
