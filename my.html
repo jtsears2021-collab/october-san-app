@@ -366,11 +366,29 @@
   let currentSort = 'newest';
   let currentUser = null;
   let snapNFTs = [];
+  let connectedAccount = null;
+  let connectedWallet = null;
 
   const stored = localStorage.getItem('octsn_user');
   if (stored) {
     currentUser = JSON.parse(stored);
     document.getElementById('header-username').textContent = '@' + currentUser.username;
+    // Reconnect wallet silently
+    (async () => {
+      try {
+        const { inAppWallet } = await import('https://esm.sh/thirdweb@5.120.1/wallets');
+        const wallet = inAppWallet();
+        const account = await wallet.connect({
+          client,
+          strategy: currentUser.provider === 'google' ? 'google' : 'apple',
+          chain: polygon,
+        });
+        connectedAccount = account;
+        connectedWallet = wallet;
+      } catch(e) {
+        console.log('Wallet reconnect:', e.message);
+      }
+    })();
   }
 
   function ipfsUrl(url) {
