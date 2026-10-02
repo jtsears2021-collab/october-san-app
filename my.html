@@ -669,14 +669,14 @@
     // Resolve ENS name if needed
     if (recipientAddress.endsWith('.eth')) {
       try {
-        const { ethers } = await import('https://esm.sh/ethers@5.7.2');
-        const provider = new ethers.providers.JsonRpcProvider('https://eth-mainnet.g.alchemy.com/v2/demo');
-        const resolved = await provider.resolveName(recipientAddress);
-        if (!resolved) {
+        const res = await fetch(`https://api.ensideas.com/ens/resolve/${recipientAddress}`);
+        const data = await res.json();
+        if (data.address) {
+          recipientAddress = data.address;
+        } else {
           alert('Could not resolve ENS name. Please check and try again.');
           return;
         }
-        recipientAddress = resolved;
       } catch(e) {
         alert('ENS resolution failed. Please use a wallet address directly.');
         return;
