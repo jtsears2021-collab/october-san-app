@@ -813,9 +813,22 @@
             try {
               const userData = await firebaseGet(`walletLookup/${ownerAddress}`);
               const username = userData.fields?.username?.stringValue;
-              ownerUsername = username || ownerAddress.substring(0,6) + '...' + ownerAddress.slice(-4);
+              if (username) {
+                ownerUsername = username;
+              } else {
+                // Try ENS reverse lookup
+                try {
+                  const ensRes = await fetch(`https://api.ensideas.com/ens/resolve/${ownerAddress}`);
+                  const ensData = await ensRes.json();
+                  ownerUsername = ensData.name || ownerAddress.substring(0,6) + '...' + ownerAddress.slice(-4);
+                } catch(e) {
+                  ownerUsername = ownerAddress.substring(0,6) + '...' + ownerAddress.slice(-4);
+                }
+              }
               userCache[ownerAddress] = ownerUsername;
-            } catch(e) {}
+            } catch(e) {
+              ownerUsername = ownerAddress.substring(0,6) + '...' + ownerAddress.slice(-4);
+            }
           }
         }
         
