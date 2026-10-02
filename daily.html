@@ -573,6 +573,12 @@
               username = data.fields?.username?.stringValue || null;
               if (username) return { ...nft, username, seller: ownerAddress, ownerFullAddress: ownerAddress };
             } catch(e) {}
+            // Try ENS reverse lookup
+            try {
+              const ensRes = await fetch(`https://api.ensideas.com/ens/resolve/${ownerAddress}`);
+              const ensData = await ensRes.json();
+              if (ensData.name) return { ...nft, username: ensData.name, ownerFullAddress: ownerAddress, ownerShortAddress: ownerAddress.substring(0,6) + '...' + ownerAddress.slice(-4) };
+            } catch(e) {}
             return { ...nft, username: null, ownerFullAddress: ownerAddress, ownerShortAddress: ownerAddress.substring(0,6) + '...' + ownerAddress.slice(-4) };
           }
         }
