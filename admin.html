@@ -633,10 +633,10 @@
         collectionNumber: parseField(f.collectionNumber) || 1,
         openTime: parseField(f.openTime) || '',
         closeTime: parseField(f.closeTime) || '',
-        venueName: parseField(f.venueName) || 'Dodger Stadium',
-        venueRadius: parseField(f.venueRadius) || 400,
-        venueLat: f.venueLat?.doubleValue || 34.0739,
-        venueLng: f.venueLng?.doubleValue || -118.2400,
+        venueLat: parseFloat(f.venueLat?.stringValue || f.venueLat?.doubleValue) || 34.0739,
+        venueLng: parseFloat(f.venueLng?.stringValue || f.venueLng?.doubleValue) || -118.2400,
+        venueRadius: parseInt(f.venueRadius?.integerValue || f.venueRadius?.stringValue) || 400,
+        venueName: parseField(f.venueName) || 'Dodger Stadium',,
       };
       updateStatusBar();
       updateForm();
