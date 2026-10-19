@@ -467,9 +467,9 @@
       const data = await res.json();
       gameTitle = data.fields?.gameTitle?.stringValue || 'October-San Moment';
       collectionNum = data.fields?.collectionNumber?.integerValue || '1';
-      STADIUM_LAT = parseFloat(data.fields?.venueLat?.doubleValue || data.fields?.venueLat?.integerValue || 34.0739);
-      STADIUM_LNG = parseFloat(data.fields?.venueLng?.doubleValue || data.fields?.venueLng?.integerValue || -118.2400);
-      STADIUM_RADIUS = parseInt(data.fields?.venueRadius?.integerValue || 400);
+      STADIUM_LAT = parseFloat(data.fields?.venueLat?.stringValue || data.fields?.venueLat?.doubleValue) || 34.0739;
+      STADIUM_LNG = parseFloat(data.fields?.venueLng?.stringValue || data.fields?.venueLng?.doubleValue) || -118.2400;
+      STADIUM_RADIUS = parseInt(data.fields?.venueRadius?.integerValue || data.fields?.venueRadius?.stringValue) || 400;
     } catch(e) {
       console.log('Game info error:', e.message);
     }
